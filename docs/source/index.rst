@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 1
 
    mailthon/mailthon
+   fabric/fabric
 
 
 Indices and tables
