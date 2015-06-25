@@ -6,13 +6,16 @@
 Welcome to Python Notes's documentation!
 ========================================
 
-Contents:
+----------------
+Python Libraries
+----------------
 
 .. toctree::
-   :maxdepth: 1
+   :name: python_libraries
+   :maxdepth: 1 
+   :glob:
 
-   mailthon/mailthon
-   fabric/fabric
+   python_libraries/*/*
 
 
 Indices and tables

@@ -7,8 +7,9 @@ fabric
 
 .. toctree::
   :maxdepth: 1
+  :glob:
 
-  examples/fabric_programatically
+  examples/*
 
 
 
