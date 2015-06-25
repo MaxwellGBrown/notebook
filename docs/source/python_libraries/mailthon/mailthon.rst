@@ -4,6 +4,10 @@ mailthon
 
 mailthon is an SMTP library that reflects the simplicty of the requets library.
 
+--------
+Examples
+--------
+
 .. toctree::
     :maxdepth: 1
     :glob:
