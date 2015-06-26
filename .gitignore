@@ -1,0 +1,4 @@
+examples/*.pyc
+docs/build/*
+env/*
+*.swp
