@@ -143,9 +143,7 @@ This example uses the same code as ``pyramid/packaging/`` but instead of using `
 pyramid/configuration/development.ini
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. highlight:: ini
-
-::
+.. code-block:: ini
 
     [app:main]
     use = egg:app_example
@@ -187,8 +185,6 @@ So, ``configuration/app_example/app.py`` will become ``configuration/app_example
 
 configuration/app_example/setup_app.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. highlight:: python
 
 ::
 
@@ -273,9 +269,7 @@ The template is going to look something like this:
 templating/app_example/templates/hello.mako
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. highlight:: html
-
-::
+.. code-block:: html
 
     <html>
     <head>
@@ -287,9 +281,6 @@ templating/app_example/templates/hello.mako
     </div>
     </body>
     </html>
-
-
-.. highlight:: python
 
 See? We're calling the title there.
 
@@ -346,3 +337,144 @@ There are a few interesting things to note in our ``tests.py`` file:
 3. The tests use ``unittest.TestCase`` class methods to do all of our ``assert`` statements. This is done so that failed tests will show the comparison values instead of just showing that the comparison failed.
 
 4. ``webtest.TestApp`` is imported in the functional tests. This separate package is used to create a wrapper for our application which we can send fake requests to and get the rendered templates and HTML response headers. 
+
+what to write tests for
+#######################
+
+Tests can be written for literally everything on the planet. But the more tests that exist, the less malleable the actual code of the progam is. Tests should be created for end functionality that is to be preserved. Don't so much test for the steps along the way (unless, that is, it is a long and meticulous process). 
+
+Also, the desired result should not be a super-exact set of requirements. Tests should check for the important sections and outcomes.
+
+
+making view controllers with pyramid
+------------------------------------
+
+As previously mentioned, pyramid is shy of the using the name **controller** to represent how the views are returned. However, this section will cover grouping views into python classes, essentially making a formal controller.
+
+The first step into converting the lone view into a controller is to create a class object to house it and the other related views.
+
+controllers/app_example/views.py
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    from pyramid.view import view_config, view_defaults
+
+    @view_defaults(renderer='templates/home.mako')
+    class AppExampleViews(object):
+        def __init__(self, request):
+            self.request = request
+
+        @view_config(route_name='home')
+        def home(self):
+            return {'name': "Home View"}
+
+        @view_config(route_name='hello')
+        def hello(self):
+            return {'name': "Hello View"}
+
+
+A few changes have been made to the view structure:
+
+1. There are now two views: the "home" view and the "hello" view. Both of these are assigned their route with ``view_config``
+2. The template used to render the views has been set at the class level with ``view_defaults``. This can be overridden on a per-route basis.
+
+``view_defaults`` is a class decorator provided by pyramid to standardize a controller's configuration. If so inclined, a class can be made to have a default ``route_name`` that handles GET, POST, DELETE, PUT, etc. for the same route, so long as it's correctly set up in the ``Configurator``.
+
+
+The output of the views in the controller have changed to output ``'name'`` instead of ``'title'`` so the template needs to be changed appropriately.
+
+controllers/app_example/templates/home.mako
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: html
+
+    <html>
+    <head>
+        <title>${name}</title>
+    </head>
+    <body>
+    <div>
+        <h1>Hi ${name}</h1>
+    </div>
+    </body>
+    </html>
+
+Because there are multiple views now, there needs to be additional routes in the ``Configurator`` in ``app_example/setup_app.py``
+
+controllers/app_example/setup_app.py
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    from pyramid.config import Configurator
+
+
+    def main(globall_config, **settings):
+        config = Configurator(settings=settings)
+        config.include('pyramid_mako')
+        config.add_route('home', '/')
+        config.add_route('hello', '/howdy')
+        config.scan('.views')
+        return config.make_wsgi_app()
+
+
+Now in the ``Configurator`` there are two defined routes:
+
+* visiting the ``/`` route will render ``AppExampleViews.home()``
+* visiting the ``/howdy`` route will render ``AppExampleViews.hello()``
+
+
+Lastly, now that we've added a new view and we've changed the way views are rendered, we need to alter ``tests.py``
+
+
+controllers/app_example/tests.py
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    import unittest
+
+    from pyramid import testing
+
+    class AppExampleViewTests(unittest.TestCase):
+        def setUp(self):
+            self.config = testing.setUp()
+
+        def tearDown(self):
+            testing.tearDown()
+
+        def test_home(self):
+            from .views import AppExampleViews
+
+            request = testing.DummyRequest()
+            controller = AppExampleViews(request)
+            response = controller.home()
+            self.assertEqual("Home View", response['name']
+
+        def test_hello(self):
+            from .views import AppExampleViews
+
+            request = testing.DummyRequest()
+            controller = AppExampleViews(request)
+            response = controller.hello()
+            self.assertEqual("Hello View", response['name'])
+
+
+    class AppExampleFunctionalTests(unittest.TestCase):
+        def setUp(self):
+            from app_example.setup_app import main
+            app = main({})
+            from webtest import TestApp
+
+            self.testapp = TestApp(app)
+
+        def test_home(self):
+            response = self.testapp.get('/', status=200)
+            self.assertIn(b'<h1>Hi Home View</h1>', response.body)
+
+        def test_hello(self):
+            response = self.testapp.get('/howdy', status=200)
+            self.assertIn(b'<h1>Hi Hello View</h1>, response.body
+
+The only difference between these tests and the previous ones is that the controller has to be obstantiated with the request and then the appropriate function needs to be called.
