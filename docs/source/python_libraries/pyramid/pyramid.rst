@@ -212,7 +212,29 @@ using templates with pyramid
 
 If you want dynamic content, you're probably going to have to do some templating baby ;). This application builds off of the previous example.
 
-First off we need to tell our ``Configurator`` what type of templating tool we're going to be using. ``pyramid`` suggests we use ``Chameleon``, but no. This is using ``mako`` templates. Note that ``pyramid_mako`` doesn't come standard and needs to be installed with ``$ pip install pyramid_mako``.
+First, ``setup.py`` needs to be updated to require the templating tool.
+
+templating/setup.py
+~~~~~~~~~~~~~~~~~~~
+
+::
+
+    from setuptools import setup
+
+    requires = [
+        'pyramid',
+        'pyramid_mako',  # newly added
+    ]
+
+    setup(name='app_example',
+          install_requires=requires,
+          entry_points="""\
+          [paste.app_factory]
+          main = app_example.setup_app:main
+          """,
+     )
+
+After that, the application ``Configurator`` needs to know the templating tool being used. ``pyramid`` suggests ``Chameleon``, but no. This is using ``mako`` templates. Note that ``pyramid_mako`` doesn't come standard and needs to be installed with ``$ pip install pyramid_mako``.
 
 templating/app_example/setup_app.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -270,3 +292,57 @@ templating/app_example/templates/hello.mako
 .. highlight:: python
 
 See? We're calling the title there.
+
+Alternatively, we could render the template ourself and return our own ``Response`` object. If we weren't using a "pyramid approved templater" then that's what we'd have to do.
+
+
+functional tests with pyramid
+-----------------------------
+
+``pyramid`` was structured to cooperate with ``nose``. We can define our own test cases very easily using the same ``unittest`` library that ``nose`` leverages.
+
+testing/app_example/tests.py
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    import unittest
+
+    from pyramid import testing
+
+
+    class AppExampleViewTests(unittest.TestCase):
+        def setUp(self):
+            self.config = testing.setUp()
+
+        def tearDown(self):
+            testing.tearDown()
+
+        def test_home(self):
+            
+            request = testing.DummyRequest()
+            response = home(request)
+            self.assertEqual('Hello', response['title'])
+
+    class AppExampleFunctionalTests(unittest.TestCase):
+        def setUp(self):
+            from app_example.setup_app import main
+            app = main({})
+            from webtest import TestApp
+
+            self.testapp = TestApp(app)
+
+        def test_home(self):
+            response = self.testapp.get('/', status=200)
+            self.assertIn(b'<h1>Hello World</h1>', response.body)
+
+
+There are a few interesting things to note in our ``tests.py`` file:
+
+1. The test file has a separate test class for the controllers (called ``view`` in pyramid), and the view (again, this view referring to the model-view-controller view, not ``pyramid.view``). This way the rendered template and the controller can be tested separately. This is a *Good Thing*.
+
+2. The tests import ``pyramid.testing`` which is used to ``setUp`` and ``tearDown`` the application. ``testing.setUp`` will handle building the configuration for this application in the view tests. The application also uses ``testing.DummyRequest()`` to send a fake request for testing.
+
+3. The tests use ``unittest.TestCase`` class methods to do all of our ``assert`` statements. This is done so that failed tests will show the comparison values instead of just showing that the comparison failed.
+
+4. ``webtest.TestApp`` is imported in the functional tests. This separate package is used to create a wrapper for our application which we can send fake requests to and get the rendered templates and HTML response headers. 
