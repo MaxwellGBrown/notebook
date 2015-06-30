@@ -26,4 +26,5 @@ In the application setup/entry point, add code that will handle event listeners 
     @subscriber(ApplicationCreated)
     def create_database_with_application(event):
         print("Initializing database...")
+        settings = event.app.registry.settings  # get .ini settings
         # create the database!
