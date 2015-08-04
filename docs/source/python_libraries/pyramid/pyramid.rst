@@ -11,19 +11,19 @@ Pyramid is the *microframework* child of ``pylons`` and ``repoze.bfg``. Use it t
   examples/*
 
 
-This page follows the basic construct as outlined in the ``pyramid`` tutorial website. Some more in-depth examples can be found in the TOC above.
+Below demonstrates the setup of a basic web app.
 
-A 1-file WSGI app
------------------
+Hello World in 1 File
+---------------------
 
-``pyramid`` because it's a *microframework*, supplies us with all the tools we'll need to create our web app and all of the freedom to organize it how we please. In contrast, a traditional framework would say "all of your templates go in ``app/templates`` and all of your controllers go in ``app/controllers``. With ``pyramid`` we can do as we please.
+``pyramid`` is a *microframework*, supplies all the tools one may need to create a web app and all of the freedom to organize it how we please. 
 
-In the 1-file WSGI app below, ``main()`` is constructing the WSGI app and ``hello_world(request)`` is the apps single controller.
+In the 1-file WSGI app below, ``main()`` is constructing the WSGI app and ``hello_world(request)`` is the apps single view.
 
 pyramid/single_file_app/helloworld.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: python
 
     from wsgiref.simple_server import make_server
     from pyramid.config import Configurator
@@ -45,12 +45,12 @@ pyramid/single_file_app/helloworld.py
         print ('Starting up server on http://localhost:6547')
         server.serve_forever()
 
-Running ``python helloworld.py`` will spin up our server and ``main()`` builds and configures the routes of our WSGI app using ``pyramid``. Upon request, the ``hello_world(request)`` controller/function is triggered and returns ``"Hello"`` as it's response.
+Running ``python helloworld.py`` will spin up the server and ``main()`` builds and configures the routes of the WSGI app using ``pyramid``. Upon request, the ``hello_world(request)`` controller/function is triggered and returns ``"Hello"`` as it's response.
 
 
 
-Packaging applications with pyramid
------------------------------------
+Pyramid & Eggs
+--------------
 
 WSGI apps are made to be portable. ``pyramid`` makes packaging apps up easy, and it requires little effort. The minimum requirements for this are:
 
@@ -60,7 +60,7 @@ WSGI apps are made to be portable. ``pyramid`` makes packaging apps up easy, and
 pyramid/packaging/setup.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: python
 
     from setuptools import setup
 
@@ -72,31 +72,46 @@ pyramid/packaging/setup.py
             install_requires=requires,
             entry_points="""\
             [paste.app_factory]
-            main = app_example.app:main
+            main = app_example.setup_app:main
             """,
     )
 
 ``setup.py``'s job is to create the egg file of our application. This egg file can be used to distribute the application and easy installation. The name of the egg will be ``app_example.egg-info``.
 
-Note that the entrypoint for ``paste.app_factory`` points to ``app_example.app:main``. It's using pythonic module-imports to point to the function ``main()`` in ``app_example/app.py``. When the app is accessed using the egg by things like ``pserve`` which go through the entry point for ``paste.app_factory`` it will provide arguments to ``app_example.app.main()`` and accept it's output to do stuff with. ``app_example.main()`` will be defined a little further down the road...
+The entrypoint for ``paste.app_factory`` points to ``app_example.setup_app:main``. It's using pythonic module-imports to point to the function ``main()`` in ``app_example/setup_app.py``. When the app is accessed using the egg by things like ``pserve``, which go through the entry point for ``paste.app_factory``, it will provide arguments to ``app_example.app.main()`` and accept it's output to do stuff with. ``app_example.main()`` will be defined a little further down the road...
 
-To complete egg setting up, the application needs to have a ``__init__.py`` file!
+
+
+The ``pyramid`` developers suggest putting ``main()`` in the ``__init__.py`` file for the application. It can be wherever one wants it to be as long as the route matches the call in the ``setup.py`` file.
+
+Either way, the application needs an ``__init__.py`` for pythonic imports!
 
 pyramid/packaging/app_example/__init__.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: python
 
-  # package
+  ## if setup.py's entryway was app_example:main, this is what it would be for
+  ##
+  ## either way, the __init__.py file is needed for pythonic imports!
+  # from pyramid.config import Configurator
+  #
+  # def main():
+  #     config = Configurator()
+  #     config.add_route('hello', '/')
+  #     config.scan('views')
+  #     app = config.make_wsgi_app()
+  #     return app
 
-Inside the application package there's going to be the file which creates web server, which mirrors a lot of the functionality of the last examples 1-file-app
 
-pyramid/packaging/app_example/app.py
+
+In this example, since ``setup.py`` points to ``app_example.setup_app:main``, the ``main()`` function, which returns the WSGI app, needs to be defined.
+
+pyramid/packaging/app_example/setup_app.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: python
 
-  from wsgiref.simple_server import make_server
   from pyramid.config import Configurator
 
   def main():
@@ -106,22 +121,18 @@ pyramid/packaging/app_example/app.py
       app = config.make_wsgi_app()
       return app
 
-  if __name__ == '__main__':
-      app = main()
-      server = make_server('localhost', 8888, app)
-      print('Starting up server on http://localhost:8888')
-      server.serve_forever()
-
 Again, the function of this file is to create a WSGI app and serve it!
 
-Now that we've set it all up, we can build our egg with ``$ python setup develop``.
+With ``main()``'s call to ``Configurator.make_wsgi_app()`` an egg can be created by typing ``$ python setup.py develop``.
 
-Note that in this example, we've added ``config.scan('views')``. What's happening here is ``pyramid``'s ``Configurator`` is scanning for any appropriately defined functions that it can use to generate responses. Below is an example of our single view.
+
+
+Note that ``config.add_view()`` has been replaced with ``config.scan()``. This scans the file ``.views`` for any defined views.
 
 pyramid/packaging/app_example/views.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: python
 
     from pyramid.response import Response
     from pyramid.view import view_config
@@ -130,15 +141,18 @@ pyramid/packaging/app_example/views.py
     def hello_world(request):
         return Response("Hello")
 
-``views.py`` is leveraging the ``pyramid.view.view_config`` wrapper function to define this function as a view for the path ``'hello'`` which is defined as a route in our ``Configurator`` object in ``app_example/app.py``. 
+``views.py`` is leveraging the ``pyramid.view.view_config`` wrapper function to define this function as a view for the path ``'hello'`` which is defined as a route in our ``Configurator`` object in ``app_example/setup_app.py``. 
+
+Using ``Configurator.scan('views')``, this file is scanned for any views defined by appropriate ``pyramid.view`` wrappers.
 
 
-pyramid and configuration files
--------------------------------
 
-``pyramid`` supplies the tools to work with ``.ini`` files with relative ease.  *I, the author, don't really like* ``.ini`` *files*. In a more formal setting we could absolutely set up the app to run with ``.yaml`` files with a different web server. But, since this is just an example, we'll stick with the suggested ``.ini`` format. 
+Configuration (.ini) files
+--------------------------
 
-This example uses the same code as ``pyramid/packaging/`` but instead of using ``pyramid/packaging/app_example/app.py`` to serve the application, this one will use a ``.yaml`` configuration file and ``pserve`` (not a real web server, but good enough for texting).
+Python's WSGI apps are traditionally served using ``.ini`` files (boooo!).
+
+The ``.ini`` file works in conjunction with pyramid's ``pserve`` command, which can be used to serve pyramid WSGI apps.
 
 pyramid/configuration/development.ini
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,25 +190,11 @@ pyramid/configuration/development.ini
     [formatter_generic]
     format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
 
+``[app:main]`` refers to the egg created from ``setup.py`` where ``main`` refers to ``entry_points="[paste.app_factory] main = app_example.setup_app:main``. Remember, that exact line is referring the function in the app that returns the WSGI app. 
 
-An important note, the ``[app:main]`` section is supposed to lead us to the ``main()`` function that returns our application. We're using the egg to access our app, hence the ``use = egg:app_example``. The naming of ``app_example`` must match the portion of ``setup.py`` where we define the name of the egg ( ``setup(name='app_example`...)``).  
+``use = egg:app_example`` refers to what the egg is named in the ``setup.py``. In this continued example it's ``name="app_example"``.
 
-Now that the duty of configuring the application has moved from ``configuration/app_example/app.py`` to the yaml file, we can change the way our app is run. The official ``pyramid`` example claims that many developers put the information to setting up the application in ``configuration/app_example/__init__.py``, but I, *the all powerful author* dislike the idea of this because it implicitly tucks it away. And, after all, **explicit is better than implicit**. 
 
-So, ``configuration/app_example/app.py`` will become ``configuration/app_example/setup_app.py`` as it has now been stripped of the responsibility of setting up and configuring the application
-
-configuration/app_example/setup_app.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-::
-
-  from pyramid.config import Configuratior
-
-  def main(global_config, **settings):
-      config = Configurator(settings=settings)
-      config.add_route('hello', '/')
-      config.scan()
-      return config.make_wsgi_app()
 
 Now that we have a separated the configuration from the app creation, we can start up the server with ``pserve``
 
@@ -203,10 +203,11 @@ Now that we have a separated the configuration from the app creation, we can sta
   $ pserve development.ini
 
 
-using templates with pyramid
-----------------------------
 
-If you want dynamic content, you're probably going to have to do some templating baby ;). This application builds off of the previous example.
+Mako Templates & Pyramid
+------------------------
+
+Pyramid comes packed with ``chameleon``. ``jinja2``, and ``mako``. This example will use ``mako``. 
 
 First, ``setup.py`` needs to be updated to require the templating tool.
 
@@ -230,7 +231,7 @@ templating/setup.py
           """,
      )
 
-After that, the application ``Configurator`` needs to know the templating tool being used. ``pyramid`` suggests ``Chameleon``, but no. This is using ``mako`` templates. Note that ``pyramid_mako`` doesn't come standard and needs to be installed with ``$ pip install pyramid_mako``.
+After that, the application ``Configurator`` needs to know the templating tool being used. Note that ``pyramid_mako`` doesn't come standard and needs to be installed with ``$ pip install pyramid_mako``.
 
 templating/app_example/setup_app.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -247,7 +248,6 @@ templating/app_example/setup_app.py
       return config.make_wsgi_app()
 
 
-Well, that was easy. 
 
 Now the view needs to be changed to use a template.
 
@@ -262,9 +262,8 @@ templating/app_example/views.py
     def hello_wrold(request):
         return dict(title='Hello World')
 
-Yeah, looks werid right? That's because we don't actually render anything in the defined ``view``. Instead, we wrap it with the file we want to render with, and return a ``dict`` that has the arguments to fill that template. The wrapper is also handling turning our HTML into a ``Response`` object, which the earlier examples return. 
 
-The template is going to look something like this:
+Since the app now uses ``pyramid_mako`` to render responses, instead of sending the content from the ``view`` to the client, the ``view`` sends the template (defined in ``view_config(renderer='templates/hello.mako')`` the blocks of information needed to render the page's content.
 
 templating/app_example/templates/hello.mako
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -282,6 +281,4 @@ templating/app_example/templates/hello.mako
     </body>
     </html>
 
-See? We're calling the title there.
-
-Alternatively, we could render the template ourself and return our own ``Response`` object. If we weren't using a "pyramid approved templater" then that's what we'd have to do.
+Alternatively, one could render the template and return a ``Response`` object instead of linking the ``view`` to a template in ``view_config``.
