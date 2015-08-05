@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #
 # Python Notes documentation build configuration file, created by
 # sphinx-quickstart on Wed Jun 24 16:20:38 2015.
@@ -138,6 +138,10 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+## ADDED BY MBROWN ##
+# so I can give code blocks better :caption: s
+html_style = 'css/customizations.css'
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
