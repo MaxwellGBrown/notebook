@@ -1,19 +1,14 @@
-﻿"""
-a mailthon example
-
-==========
-5-Email.py
-==========
-
-This example outlines how we can interact with the standard email library
-"""
-
-import email
-
+﻿import email
 import mailthon
 
 
 def message_into_envelope(message):
+    """
+    Returns a mailthon.envelope.Envelope of the email.message
+
+    Copies all headers from the original message.
+    Turns all mime-parts into enclosures.
+    """
     headers = mailthon.headers.Headers(message.items())
     enclosures = message_into_enclosures(message)
     return mailthon.envelope.Envelope(headers, enclosures)
