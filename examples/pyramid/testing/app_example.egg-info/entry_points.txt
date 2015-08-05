@@ -1,3 +1,0 @@
-        [paste.app_factory]
-        main = app_example.setup_app:main
-        
