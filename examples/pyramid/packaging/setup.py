@@ -4,10 +4,10 @@ requires = [
         'pyramid',
 ]
 
-setup(name="example_app",
+setup(name="app_example",
         install_requires=requires,
         entry_points="""\
                 [paste.app_factory]
-                main = example_app:main
+                main = app_example.setup_app:main
                 """,
 )

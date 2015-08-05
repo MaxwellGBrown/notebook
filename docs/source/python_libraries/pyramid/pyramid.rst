@@ -54,8 +54,8 @@ Pyramid & Eggs
 
 WSGI apps are made to be portable. ``pyramid`` makes packaging apps up easy, and it requires little effort. The minimum requirements for this are:
 
-* having a ``setup.py``
-* a basic directory structure 
+* having a ``setup.py`` that uses ``setuptools.setup()`` to build entry points
+* a basic python directory structure with ``__init__.py`` files.
 
 pyramid/packaging/setup.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
