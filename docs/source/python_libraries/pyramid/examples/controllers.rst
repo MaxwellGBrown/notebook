@@ -9,10 +9,9 @@ Setting up the views
 
 To group logically related views into a class there are two decorators that can be leveraged from ``pyramid.view``. ``view_config``, a class decorator, and ``view_defaults``.
 
-controllers/app_example/views.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: controllers/app_example/views.py
 
     from pyramid.view import view_config, view_defaults
 
@@ -43,10 +42,9 @@ Changing the Configurator for Controllers
 
 Because there are multiple views now, there needs to be additional routes in the ``Configurator`` in ``app_example/setup_app.py``
 
-controllers/app_example/setup_app.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: controllers/app_example/setup_app.py
 
     from pyramid.config import Configurator
 
@@ -71,10 +69,9 @@ The default template for the Controller
 
 /templates/home.mako is the template that is shared in the Controller as defined by the class decorator ``view_defaults()``. This is the template that matches that controller.
 
-controllers/app_example/templates/home.mako
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: html
+    :caption: controllers/app_example/templates/home.mako
 
     <html>
     <head>
@@ -94,10 +91,9 @@ nosetests for the Controller
 
 Setting up nosetests to work with Controller style views requires a little extra work. Instead of running a request through a view function, the Controller class needs to be initialized with the request and then the view method needs to be called.
 
-controllers/app_example/tests.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: controllers/app_example/tests.py
 
     import unittest
 

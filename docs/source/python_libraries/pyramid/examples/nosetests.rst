@@ -4,10 +4,9 @@ Pyramid & Nosetests
 
 ``pyramid`` was structured to cooperate with ``nose``. We can define our own test cases very easily using the same ``unittest`` library that ``nose`` leverages.
 
-testing/app_example/tests.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: testing/app_example/tests.py
 
     import unittest
 

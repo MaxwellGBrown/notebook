@@ -20,10 +20,9 @@ Hello World in 1 File
 
 In the 1-file WSGI app below, ``main()`` is constructing the WSGI app and ``hello_world(request)`` is the apps single view.
 
-pyramid/single_file_app/helloworld.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: pyramid/single_file_app/helloworld.py
 
     from wsgiref.simple_server import make_server
     from pyramid.config import Configurator
@@ -57,10 +56,9 @@ WSGI apps are made to be portable. ``pyramid`` makes packaging apps up easy, and
 * having a ``setup.py`` that uses ``setuptools.setup()`` to build entry points
 * a basic python directory structure with ``__init__.py`` files.
 
-pyramid/packaging/setup.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: pyramid/packaging/setup.py
 
     from setuptools import setup
 
@@ -86,10 +84,9 @@ The ``pyramid`` developers suggest putting ``main()`` in the ``__init__.py`` fil
 
 Either way, the application needs an ``__init__.py`` for pythonic imports!
 
-pyramid/packaging/app_example/__init__.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: pyramid/packaging/app_example/__init__.py
 
   ## if setup.py's entryway was app_example:main, this is what it would be for
   ##
@@ -107,10 +104,9 @@ pyramid/packaging/app_example/__init__.py
 
 In this example, since ``setup.py`` points to ``app_example.setup_app:main``, the ``main()`` function, which returns the WSGI app, needs to be defined.
 
-pyramid/packaging/app_example/setup_app.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: pyramid/packaging/app_example/setup_app.py
 
   from pyramid.config import Configurator
 
@@ -129,10 +125,9 @@ With ``main()``'s call to ``Configurator.make_wsgi_app()`` an egg can be created
 
 Note that ``config.add_view()`` has been replaced with ``config.scan()``. This scans the file ``.views`` for any defined views.
 
-pyramid/packaging/app_example/views.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+    :caption: pyramid/packaging/app_example/views.py
 
     from pyramid.response import Response
     from pyramid.view import view_config
@@ -154,10 +149,9 @@ Python's WSGI apps are traditionally served using ``.ini`` files (boooo!).
 
 The ``.ini`` file works in conjunction with pyramid's ``pserve`` command, which can be used to serve pyramid WSGI apps.
 
-pyramid/configuration/development.ini
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: ini
+    :caption: pyramid/configuration/development.ini
 
     [app:main]
     use = egg:app_example
@@ -211,10 +205,9 @@ Pyramid comes packed with ``chameleon``. ``jinja2``, and ``mako``. This example 
 
 First, ``setup.py`` needs to be updated to require the templating tool.
 
-templating/setup.py
-~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: python
+    :caption: templating/setup.py
 
     from setuptools import setup
 
@@ -233,10 +226,9 @@ templating/setup.py
 
 After that, the application ``Configurator`` needs to know the templating tool being used. Note that ``pyramid_mako`` doesn't come standard and needs to be installed with ``$ pip install pyramid_mako``.
 
-templating/app_example/setup_app.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: python
+    :caption: templating/app_example/setup_app.py
 
   from pyramid.config import Configurator
 
@@ -251,10 +243,9 @@ templating/app_example/setup_app.py
 
 Now the view needs to be changed to use a template.
 
-templating/app_example/views.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: python
+    :caption: templating/app_example/views.py
     
     from pyramid.view import view_config
 
@@ -265,10 +256,9 @@ templating/app_example/views.py
 
 Since the app now uses ``pyramid_mako`` to render responses, instead of sending the content from the ``view`` to the client, the ``view`` sends the template (defined in ``view_config(renderer='templates/hello.mako')`` the blocks of information needed to render the page's content.
 
-templating/app_example/templates/hello.mako
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: html
+    :caption: templating/app_example/templates/hello.mako
 
     <html>
     <head>
