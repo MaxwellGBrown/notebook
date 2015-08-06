@@ -13,7 +13,7 @@ Examples
   :maxdepth: 1
   :glob:
 
-  examples/*
+  ./*/*
 
 
 
@@ -24,7 +24,8 @@ Typical use involves creating a ``fabfile`` and executing commands in that file 
 A small, yet complete, fabfile
 ------------------------------
 
-::
+.. code-block:: python
+    :caption: fabfile.py
 
     from fabric.api import run
 

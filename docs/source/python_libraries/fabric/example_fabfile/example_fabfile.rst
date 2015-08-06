@@ -6,22 +6,9 @@ Using fab & fabfile
 
 Below is an example ``fabfile.py``:
 
-::
-
-    from fabric.api import run
-
-    env.hosts = ['remote_host1', 'remote_host2', 'remote_host3']
-
-    def get_hostname():
-        run("hostname")
-
-    def make_blank_file(file_name="blank_file.txt"):
-        run("touch {}".format(file_name))
-
-    def do_both(echo):
-        get_hostname()
-        print echo
-        make_blank_file()
+.. literalinclude:: fabfile.py
+    :language: python
+    :caption: fabfile.py
 
 Although this ``fabfile`` is trivial, it can provide a good enough example to explain what fab was made for.
 
