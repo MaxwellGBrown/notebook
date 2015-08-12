@@ -12,7 +12,7 @@ Examples
     :maxdepth: 1
     :glob:
 
-    examples/*
+    ./*/*
 
 
 ----------
