@@ -1,12 +1,11 @@
-==============================
-mailthon and the email library
-==============================
+================
+mailthon & email
+================
 
 This section highlights some examples of working with ``mailthon`` and ``email``.
 
-======================================
 Turning email.Message into an envelope
-======================================
+--------------------------------------
 
 ``mailthon`` takes a lot of advantage of ``email`` MIME objects. However, we need to manage how to take the different character sets of text parts and different encoding of non-text parts and structure them into ``Enclosure`` objects and convert the email's headers into ``Headers`` objects. 
 
