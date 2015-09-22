@@ -12,7 +12,7 @@ The very easy workaround to this issue is to override that sub-forms ``__init__`
     :emphasize-lines: 8-11
 
     from wtforms import SelectField, FormField, FieldList
-    import random
+    from random import randint as r_int
 
 
     class SubForm(Form):
@@ -20,8 +20,8 @@ The very easy workaround to this issue is to override that sub-forms ``__init__`
 
         def __init__(self, *args, **kwargs):
             super(SubForm, self).__init__(*args, **kwargs)
-            new_choices = [(n, n) for n in range(random.randint(0,100), random.randint(0,101))]
-            self.choices = new_choices
+            new_choices = [(n, n) for n in range(r_int(0,100), r_int(0,101))]
+            self.numbers.choices = new_choices
 
     class MainForm(Form):
         subforms = FieldList(FormField(SubForm))
