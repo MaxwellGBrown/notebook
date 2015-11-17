@@ -18,6 +18,18 @@ Python Libraries
    python_libraries/*/*
 
 
+--------------------
+Programming Patterns
+--------------------
+
+.. toctree::
+   :name: programming_patterns
+   :maxdepth: 1
+   :glob:
+
+   programming_patterns/*/*
+
+
 Indices and tables
 ==================
 
