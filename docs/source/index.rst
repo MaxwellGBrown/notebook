@@ -15,7 +15,7 @@ Python Libraries
    :maxdepth: 1 
    :glob:
 
-   python_libraries/*/*
+   python_libraries/fabric
 
 
 Indices and tables
