@@ -1,3 +1,4 @@
+.. _mako:
 ====
 mako
 ====
@@ -8,9 +9,8 @@ Mako is a templating library. It works best as a markup language templater.
 
 .. toctree::
   :maxdepth: 1
-  :glob:
 
-  ./*/*
+  form_as_separate_template/form_as_separate_template
 
 **Related Examples**
 
