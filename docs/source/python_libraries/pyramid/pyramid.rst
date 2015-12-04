@@ -17,7 +17,6 @@ Pyramid is the *microframework* child of ``pylons`` and ``repoze.bfg``. Use it t
 **Related Examples**
 
 * :ref:`form_as_separate_template`
-
   
 ----------
 The Basics

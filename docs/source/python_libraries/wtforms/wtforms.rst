@@ -6,7 +6,7 @@ WTForms
 
 ``wtforms`` is an HTML form building and validation tool. 
 
-Note that examples for this package may reference ``mako`` templating or ``pyramid`` for server.
+Note that examples for this package may reference :ref:`mako <mako>` templating or :ref:`pyramid <pyramid>` for server.
 
 **Examples**
 

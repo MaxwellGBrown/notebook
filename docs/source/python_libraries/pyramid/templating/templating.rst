@@ -1,3 +1,4 @@
+.. _mako_templates_and_pyramid:
 
 Mako Templates & Pyramid
 ------------------------

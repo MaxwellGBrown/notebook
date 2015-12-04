@@ -4,11 +4,17 @@ mako
 
 Mako is a templating library. It works best as a markup language templater.
 
+**Examples**
+
 .. toctree::
   :maxdepth: 1
   :glob:
 
   ./*/*
+
+**Related Examples**
+
+* :ref:`mako_templates_and_pyramid`
 
 
 Everything you need to know in one template
