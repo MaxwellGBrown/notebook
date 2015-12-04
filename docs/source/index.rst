@@ -15,7 +15,13 @@ Python Libraries
    :maxdepth: 1 
    :glob:
 
-   python_libraries/*/*
+   python_libraries/fabric
+   python_libraries/mailthon
+   python_libraries/mako
+   python_libraries/unittest
+   python_libraries/paramiko
+   python_libraries/pyramid
+   python_libraries/wtforms
 
 
 --------------------
