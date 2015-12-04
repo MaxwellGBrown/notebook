@@ -1,6 +1,6 @@
-================
-mailthon & email
-================
+=======================================
+Mailthon and the Standard Email Library
+=======================================
 
 This section highlights some examples of working with ``mailthon`` and ``email``.
 

@@ -1,6 +1,6 @@
-==========
-enclosures
-==========
+===================
+Mailthon Enclosures
+===================
 
 ------------------
 mailthon.enclosure

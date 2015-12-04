@@ -1,6 +1,6 @@
-==========
-middleware
-==========
+===================
+Mailthon Middleware
+===================
 
 ``mailthon`` allows us to plug middleware into our SMTP connection so that we can interact with other features of our SMTP server. It's important to note that the middleware can only interact with with the SMTP server connection object, and nothing else. Any middleware made will depend solely on the different commands and interactions the SMTP server provides. 
 

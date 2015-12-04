@@ -16,6 +16,7 @@ Python Libraries
    :glob:
 
    python_libraries/fabric
+   python_libraries/mailthon
 
 
 Indices and tables
