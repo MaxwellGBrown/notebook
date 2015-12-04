@@ -2,10 +2,10 @@
 Testing with Pyramid
 ====================
 
-nosetests
----------
+Writing Unit Tests for Pyramid
+------------------------------
 
-``pyramid`` was structured to cooperate with ``nose``. We can define our own test cases very easily using the same ``unittest`` library that ``nose`` leverages.
+``pyramid`` was structured to cooperate with ``unittest`` frameworks.
 
 
 .. literalinclude:: basic_app/tests.py

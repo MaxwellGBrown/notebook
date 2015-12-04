@@ -20,6 +20,7 @@ Python Libraries
    python_libraries/mako
    python_libraries/unittest
    python_libraries/paramiko
+   python_libraries/pyramid
 
 
 Indices and tables

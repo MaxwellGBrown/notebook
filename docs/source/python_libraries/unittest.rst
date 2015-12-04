@@ -8,6 +8,7 @@ unittest
     :maxdepth: 1
 
     examples/unittest_assert_methods/unittest_assert_methods
+    examples/pyramid_unittests/pyramid_unittests
 
 Developers can use ``nose`` or ``py.test`` frameworks to run developer defined unittests.
 

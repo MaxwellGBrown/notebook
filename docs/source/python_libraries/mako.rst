@@ -11,7 +11,7 @@ Mako is a templating library. It works best as a markup language templater.
 .. toctree::
   :maxdepth: 1
 
-  examples/pyramid_and_mako_templates/pyramid_and_mako_templates
+  examples/pyramid_templating/pyramid_templating
   examples/form_as_separate_template/form_as_separate_template
 
 

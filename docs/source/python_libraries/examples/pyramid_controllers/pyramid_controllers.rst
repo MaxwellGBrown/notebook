@@ -52,7 +52,8 @@ The default template for the Controller
     :caption: basic_app/templates/home.mako
 
 
-nosetests for the Controller
+
+unittests for the Controller
 ----------------------------
 
 Setting up unit tests to run with Controller style views requires a little extra work. Instead of running a request through a view function, the Controller class needs to be initialized with the request and then the view method needs to be called.
