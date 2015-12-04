@@ -18,6 +18,7 @@ Python Libraries
    python_libraries/fabric
    python_libraries/mailthon
    python_libraries/mako
+   python_libraries/unittest
 
 
 Indices and tables

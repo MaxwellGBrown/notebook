@@ -1,21 +1,24 @@
-====
-nose
-====
+========
+unittest
+========
 
-``nose`` is a python unit testing framework that runs unit tests. Install it by running ``pip install nose`` and run it in the shell with ``$ nosetests``.
+``unittest`` is a python unit testing library that defines test suites for developers to run.
 
 .. toctree::
     :maxdepth: 1
-    :glob:
 
-    ./*/*
+    examples/unittest_assert_methods/unittest_assert_methods
 
-``nose`` will automatically determine any written tests that are written. Anything that inherits from ``unittests.TestCase`` will be run by ``nose``. ``nose`` will also check any functions with the prefix ``test_``. Basically, if it looks like it might be a test, ``nose`` will try and run it!
+Developers can use ``nose`` or ``py.test`` frameworks to run developer defined unittests.
+
+These frameworks will automatically determine any written tests that are written. Anything that inherits from ``unittests.TestCase`` will be run. They will also check any functions or classes with the prefix ``test_``.
+
+Basically, if it looks like it might be a test, these frameworks will try and run it!
 
 Building nosetests with unittest
 --------------------------------
 
-Although ``nose`` can operate perfectly fine without the ``unittest`` module, the ``unittest`` module provides a good suite to build tests under.
+Although most testing frameworks can operate perfectly fine without the ``unittest`` module, the ``unittest`` module provides a good suite to build tests under.
 
 test fixtures using unittest.TestCase 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,13 +27,15 @@ Any class that inherits from ``unittest.TestCase`` can take advantage of the cla
 test fixtures and scopes
 ++++++++++++++++++++++++
 
-``nose`` begins by importing a file that contains tests. To set up the scope for that module, it calls any available ``setUpModule()`` functions defined in the file/module. This scope should handle any configurations that are shared by test fixures in the same module.
+Modern test frameworks begin by importing a file that contains tests. To set up the scope for that module, it calls any available ``setUpModule()`` functions defined in the file/module. This scope should handle any configurations that are shared by test fixures in the same module.
 
 ``nose`` then obstantiates any test fixtures by calling the **classmethod** ``setUpClass``. This scope should handle any taxing settings that are shared within the class (e.g. database constructions, server connections)
 
 After setting up the class, each test that is a part of the obstantiated class is prepped for by calling ``setUp``. This scope is reserved for resetting the status of the test fixture so that all tests have equal testing grounds (e.g. resetting the database cursor, changing back to a root directory).
 
-After the test has concluded, ``nose`` closes the test scope with ``tearDown``. After all the tests in the fixture have been run, ``tearDownClass`` is called. After all the fixtures in a module have been run, ``tearDownModule`` is called.
+After the test has concluded, the framework closes the test scope with ``tearDown``. After all the tests in the fixture have been run, ``tearDownClass`` is called. After all the fixtures in a module have been run, ``tearDownModule`` is called.
+
+Below is an example of this scope using ``nose``.
 
 ::
 
@@ -59,9 +64,9 @@ For any other tests that aren't tested via assert statements, one can call ``Tes
 
 Below is an example of how using ``TestCase`` can provide a healthy environment to create unit tests:
 
-.. literalinclude:: basic_tests.py
+.. literalinclude:: examples/unittest_basic_tests/unittest_basic_tests.py
     :language: python
-    :caption: basic_tests.py
+    :caption: unittest_basic_tests.py
 
 Using ``nose``, the test cases within the test fixture are automatically detected. There's no work that has to be done to run the tests in the correct fashion.
 
@@ -100,7 +105,3 @@ Example:
       AssertionError: 'Not Testing' != 'Testing'
 
    ----------------------------------------------------------------------
-
-What to write unit tests for
-----------------------------
-This topic desires more time and attention than I currently have to explain to my future self...
