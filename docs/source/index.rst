@@ -17,6 +17,7 @@ Python Libraries
 
    python_libraries/fabric
    python_libraries/mailthon
+   python_libraries/mako
 
 
 Indices and tables
