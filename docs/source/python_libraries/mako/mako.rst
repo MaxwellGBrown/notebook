@@ -8,7 +8,7 @@ Mako is a templating library. It works best as a markup language templater.
   :maxdepth: 1
   :glob:
 
-  examples/*
+  ./*/*
 
 
 Everything you need to know in one template
