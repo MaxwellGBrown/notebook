@@ -24,6 +24,18 @@ Python Libraries
    python_libraries/wtforms
 
 
+--------------------
+Programming Patterns
+--------------------
+
+.. toctree::
+   :name: programming_patterns
+   :maxdepth: 1
+   :glob:
+
+   programming_patterns/*/*
+
+
 Indices and tables
 ==================
 
