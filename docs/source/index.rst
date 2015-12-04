@@ -21,6 +21,7 @@ Python Libraries
    python_libraries/unittest
    python_libraries/paramiko
    python_libraries/pyramid
+   python_libraries/wtforms
 
 
 Indices and tables

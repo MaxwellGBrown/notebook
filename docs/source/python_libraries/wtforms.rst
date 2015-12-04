@@ -1,7 +1,7 @@
 .. _wtforms:
 
 =======
-WTForms
+wtforms
 =======
 
 ``wtforms`` is an HTML form building and validation tool. 
@@ -12,27 +12,26 @@ Note that examples for this package may reference :ref:`mako <mako>` templating 
 
 .. toctree::
     :maxdepth: 1
-    :glob:
 
-    ./*/*
+    examples/wtforms_dynamic_select_fields/dynamic_select_fields
+    examples/wtforms_one_to_many_subform/one_to_many_subform
+    examples/validating_inline_edits/validating_inline_edits
+    examples/form_as_separate_template/form_as_separate_template
 
-**Related Examples**
-
-* :ref:`form_as_separate_template`
 
 ----------
 The Basics
 ----------
 
-The following basic information on using ``WTForms`` is gleaned from the `Crash Course <https://wtforms.readthedocs.org/en/latest/crash_course.html>`_ in WTForms documentation.
+The following basic information on using ``wtforms`` is gleaned from the `Crash Course <https://wtforms.readthedocs.org/en/latest/crash_course.html>`_ in wtforms documentation.
 
 ^^^^^^^^^^^^^^^
 Defining a form
 ^^^^^^^^^^^^^^^
 
-The below information is gleaned from ``WTForms``'s 
+The below information is gleaned from ``wtforms``'s 
 
-The basic blocks of ``WTForms`` is the ``Form``, the ``Field``, the ``Widget``, which is part of the ``Field``, and the ``Validator``.
+The basic blocks of ``wtforms`` is the ``Form``, the ``Field``, the ``Widget``, which is part of the ``Field``, and the ``Validator``.
 
 The block below shows how a ``Form`` is defined using ``Fields`` and ``Validators``:
 
@@ -104,7 +103,7 @@ The below example is how one might render a form using ``mako``.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Create/Edit with WTForms
+Create/Edit with wtforms
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``wtforms`` can populate and validate a ``Form`` with the submitted POST data that matches the ``Form``. After the validation the data can be taken from the ``Form``'s ``Fields`` to manipulate as desired.
