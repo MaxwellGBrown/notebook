@@ -6,9 +6,8 @@ paramiko is an SSH package for python. Use it to SSH into things.
 
 .. toctree::
   :maxdepth: 1
-  :glob:
 
-  ./*/*
+  examples/paramiko_recursively_move_files/paramiko_recursively_move_files
 
  
 Quickstart

@@ -19,6 +19,7 @@ Python Libraries
    python_libraries/mailthon
    python_libraries/mako
    python_libraries/unittest
+   python_libraries/paramiko
 
 
 Indices and tables
