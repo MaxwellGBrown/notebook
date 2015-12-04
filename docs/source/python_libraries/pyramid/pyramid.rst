@@ -1,8 +1,12 @@
+.. _pyramid:
+
 =======
 pyramid
 =======
 
 Pyramid is the *microframework* child of ``pylons`` and ``repoze.bfg``. Use it to make your WSGI apps ;).
+
+**Examples**
 
 .. toctree::
   :maxdepth: 1
@@ -10,7 +14,14 @@ Pyramid is the *microframework* child of ``pylons`` and ``repoze.bfg``. Use it t
 
   ./*/*
   
+**Related Examples**
 
+* :ref:`form_as_separate_template`
+
+  
+----------
+The Basics
+----------
 
 Below demonstrates the setup of a basic web app.
 

@@ -1,3 +1,5 @@
+.. _form_as_separate_template:
+
 =====================================
 Separate Template for Rendering Forms
 =====================================
@@ -12,9 +14,9 @@ This is just one use case for housing the form in it's own template & view calla
 
   This example builds off the following knowladge bases:
 
-  * pyramid
+  * :ref:`pyramid <pyramid>`
   * jQuery
-  * WTForms
+  * :ref:`WTForms <wtforms>`
 
   Understanding the above will improve the "brilliance" of this examples magic.
 

@@ -1,3 +1,5 @@
+.. _wtforms:
+
 =======
 WTForms
 =======
@@ -6,15 +8,17 @@ WTForms
 
 Note that examples for this package may reference ``mako`` templating or ``pyramid`` for server.
 
---------
-Examples
---------
+**Examples**
 
 .. toctree::
     :maxdepth: 1
     :glob:
 
     ./*/*
+
+**Related Examples**
+
+* :ref:`form_as_separate_template`
 
 ----------
 The Basics
