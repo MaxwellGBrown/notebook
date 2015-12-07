@@ -16,7 +16,7 @@ Pyramid is the *microframework* child of ``pylons`` and ``repoze.bfg``. Use it t
   examples/pyramid_unittests/pyramid_unittests
   examples/pyramid_database_setup/pyramid_database_setup
   examples/form_as_separate_template/form_as_separate_template 
-  examples/validating_inline_edits/validating_inline_edits
+  Inline Edits with X-Editable <examples/validating_inline_edits/validating_inline_edits>
   
 ----------
 The Basics
