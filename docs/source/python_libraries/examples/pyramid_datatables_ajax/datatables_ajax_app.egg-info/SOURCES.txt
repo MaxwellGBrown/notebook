@@ -1,0 +1,7 @@
+setup.py
+datatables_ajax_app.egg-info/PKG-INFO
+datatables_ajax_app.egg-info/SOURCES.txt
+datatables_ajax_app.egg-info/dependency_links.txt
+datatables_ajax_app.egg-info/entry_points.txt
+datatables_ajax_app.egg-info/requires.txt
+datatables_ajax_app.egg-info/top_level.txt
