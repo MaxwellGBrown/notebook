@@ -2,6 +2,8 @@
 AJAX DataTables & Pyramid
 =========================
 
+**can be found in** ``exaples/pyramid_datatables_ajax/``
+
 DataTables is a jQuery package that creates neat, clean, and sexy tables that
 can have their functionality extended with minimal effort (...sometimes).
 
