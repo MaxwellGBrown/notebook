@@ -52,15 +52,27 @@ With a constructed model and a form to match a model object, we can use X-Editab
 .. literalinclude:: inline_app/views.py
     :language: python
     :caption: inline_app/views.py
-    :lines: 25-50
-    :emphasize-lines: 32-34, 36
+    :emphasize-lines: 10-12, 15 
+    :lines: 25-51
 
-The submitted ``pk`` value is used to retrieve the object that's being edited from the ORM (pseduo-orm in this example). Then, the value of the object is changed using ``setattr()``: the ``name`` submitted in the POST matches the objects class member and the ``value`` matches what the new value should be. 
+The submitted ``pk`` value is used to retrieve the object that's being edited from the ORM (pseduo-orm in this example). 
 
-After changing the objects values, it's used as the initializing argument to the form object that matches the model, and then validated. If there's an error in the single change made to the object, it will not validate. 
+To validate a change to this object, the form is populated with the current values of the object. 
 
-Some more complex models might need a bit of coercing to work with their form. In these instances, any data for the form's fields can be supplied as kwargs of a matching name.
+Next,the corrosponding field from the form is retrieved using ``getattr()`` and the POSTed ``name`` value (which should corrospond to the ``__name__`` of the ORM field and the form field). The POSTed ``value`` is then used to overwrite the current form value using ``field.process_formdata([value])``.
 
+.. note::
+   ``.process_formdata`` takes a list as an argument because when retrieving submitted params in a request, there can be more than 1 value for that key. 
+
+   ``.process_formdata`` will always use the item at index 0, unless overwritten.
+
+
+After updating the formdata with the POSTed values, the form is validated. If there are no errors, ``setattr()`` is run using the ORM object, ``name``, and ``value``, and then the change is committed. If validation fails, nothing is changed!
+
+.. note::
+   The initialization of ``wtforms.Form`` sometimes has trouble reading data from relationships between ORM objects. 
+
+   However, if the object can be converted to a dictionary, wtforms.Form uses it's ``**kwargs`` as form data on itialization.
 
 ------------
 Full Example

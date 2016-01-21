@@ -30,17 +30,18 @@ def inline_edit(request):
     value = request.POST.get("value")
 
     name_to_be_edited = names.get(pk)
-    old_value = getattr(name_to_be_edited, name)
-    setattr(name_to_be_edited, name, value)
 
     form = NameForm(obj=name_to_be_edited)
+    field = getattr(form, name)
+    field.process_formdata([value])  # change the value of the field
+
     if form.validate():  # the change was good!
+        setattr(name_to_be_edited, name, value)
         # session.commit()  # in ORM you'd commit the change!
         response = Response()
         return response  # 200 OK tells X-Editable everything worked
     else:  # change was bad!
-        # in ORM you would just not commit, or rollback if necessary
-        setattr(name_to_be_edited, name, old_value)
+        # Since validation failed, no change is made!
         response = Response()
         response.status_int = 422  # Unprocessable Entity is most-correct
         errors = []
