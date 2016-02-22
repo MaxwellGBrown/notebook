@@ -2,16 +2,25 @@
 from pyramid.config import Configurator
 
 from pyramid.view import view_config, view_defaults
-from webhelpers.html import literal
 from wtforms import Form, StringField, FieldList, FormField
 
+from dynamic_field_list import DynamicFieldList
 
-class ChildForm(Form):
-    tag = StringField("Tag")
 
-class ParentForm(Form):
-    name = StringField("Name")
-    tags = FieldList(FormField(ChildForm))
+class PhoneNumberForm(form):
+    location = SelectField("Location",
+            options=[
+                ("home", "Home Phone"),
+                ("work", "Work Phone"),
+                ("cell", "Cell Phone"),
+                ],
+            )
+    number = TextField("Phone Number")
+
+class ContactForm(form):
+    name = TextField("Name")
+    phone_numbers = DynamicFieldList(FormField(PhoneNumberForm))
+
 
 @view_defaults(renderer='form.mako')
 class AppController(object):
@@ -21,18 +30,11 @@ class AppController(object):
     @view_config(route_name="form")
     def form(self):
         form = ParentForm(self.request.POST)
-
         if self.request.method == "POST" and form.validate():
-            # form.populate_obj(parent)
-            print form.name.data
-            for child in form.tags.entries:
-                print "\t{}".format(child.tag.data)
-
-        return {
-                "form": form,
-                "child_form": ChildForm,
-                "literal": literal,
-                }
+            print("Validated!")
+            for key, value in form.data.items():
+                print("{}: {}".format(key, value))
+        return {"form": form}
 
 
 if __name__ == "__main__":
