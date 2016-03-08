@@ -34,6 +34,7 @@ Many examples will have functional code examples in ``docs/source/python_librari
    :glob:
 
    python_libraries/fabric
+   python_libraries/imaplib
    python_libraries/mailthon
    python_libraries/mako
    python_libraries/unittest
