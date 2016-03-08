@@ -38,6 +38,7 @@ Many examples will have functional code examples in ``docs/source/python_librari
    python_libraries/mako
    python_libraries/unittest
    python_libraries/paramiko
+   python_libraries/pymongo
    python_libraries/pyramid
    python_libraries/wtforms
 
