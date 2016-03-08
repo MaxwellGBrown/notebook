@@ -25,6 +25,18 @@ Python Libraries
 
 
 --------------------
+Python Code Snippets
+--------------------
+
+.. toctree::
+   :name: python_snippets
+   :maxdepth: 1
+   :glob:
+
+   python_snippets/dictionary_combinations
+
+
+--------------------
 Programming Patterns
 --------------------
 
