@@ -2,7 +2,7 @@
 imaplib
 =======
 
-``imaplib`` is a package that communicates with an IMAP server, which is used to store email.
+`imaplib <https://docs.python.org/3/library/imaplib.html>`_ is a package that communicates with an IMAP server, which is used to store email.
 
 IMAP is specified by `RFC3501 <https://tools.ietf.org/html/rfc3501>`_ and, although ``imaplib`` hanldes a *bit* of the communication, a lot of the functions/methods require an understanding of RFC3501 & it's commands.
 
