@@ -83,21 +83,20 @@ example output
 
 ::
 
-    >> x = OrderedDict()
-    >> A = x.setdefault('A', OrderedDict())
-    >> A['1'] = 'A1'
-    >> A['2'] = 'A2'
-    >> A['3'] = 'A3'
-    >> B = x.setdefault('B', list())
-    >> B.append("B1")
-    >> B.append("B2")
-    >> B.append("B3")
-    >> C = x.setdefault('C', OrderedDict())
-    >> C['Key1'] = "C1"
-    >> C['Key2'] = "C2"
-    >>
-    >> for c in dict_combinations(x):
-    >>     print(c)
+    >>> x = OrderedDict()
+    >>> A = x.setdefault('A', OrderedDict())
+    >>> A['1'] = 'A1'
+    >>> A['2'] = 'A2'
+    >>> A['3'] = 'A3'
+    >>> B = x.setdefault('B', list())
+    >>> B.append("B1")
+    >>> B.append("B2")
+    >>> B.append("B3")
+    >>> C = x.setdefault('C', OrderedDict())
+    >>> C['Key1'] = "C1"
+    >>> C['Key2'] = "C2"
+    >>> for c in dict_combinations(x):
+    >>>     print(c)
 
     OrderedDict([('A', 'A1'), ('B', 'B1'), ('C', 'C1')])
     OrderedDict([('A', 'A1'), ('B', 'B1'), ('C', 'C2')])
