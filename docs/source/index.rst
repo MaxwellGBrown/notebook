@@ -39,8 +39,8 @@ Many examples will have functional code examples in ``docs/source/python_librari
    mailthon <python_libraries/mailthon/mailthon>
    mako <python_libraries/mako/mako>
    unittest <python_libraries/unittest/unittest>
-   paramiko <python_libraries/paramiko>
-   python_libraries/pymongo
+   paramiko <python_libraries/paramiko/paramiko>
+   pymongo <python_libraries/pymongo/pymongo>
    pyramid <python_libraries/pyramid/pyramid>
    wtforms <python_libraries/wtforms/wtforms>
 
