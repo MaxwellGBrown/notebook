@@ -75,4 +75,6 @@ Examples aren't necessarily functional examples, but more of a demonstration of 
    :glob:
 
    programming_patterns/dependancy_injection/dependancy_injection
+   programming_patterns/metaclasses/metaclasses
+
 
