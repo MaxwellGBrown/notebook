@@ -8,18 +8,19 @@ Mako is a templating library. It works best as a markup language templater.
 
 **Examples**
 
+
 .. toctree::
   :maxdepth: 1
 
-  examples/pyramid_templating/pyramid_templating
-  examples/form_as_separate_template/form_as_separate_template
+  ../pyramid/pyramid_templating/pyramid_templating
+  ../pyramid/form_as_separate_template/form_as_separate_template
 
 
 Everything you need to know in one template
 -------------------------------------------
 
 
-.. literalinclude:: examples/mako_basic/template_file.mako
+.. literalinclude:: mako_basic/template_file.mako
     :caption: mako_basic/template_file.mako
     :language: mako
 
@@ -33,7 +34,7 @@ Inheriting from a different template
 To render a template like ``basic/template_file.mako``, the base.mako needs to be defined too.
 
 
-.. literalinclude:: examples/mako_basic/base.mako
+.. literalinclude:: mako_basic/base.mako
     :caption: mako_basic/base.mako
     :language: mako
 
@@ -50,6 +51,6 @@ Render ``template_file.mako`` by reading it as a ``mako.template.Template``.
 Because ``template_file.mako`` inherits from ``base.mako``, a correctly configured ``mako.lookup.TemplateLookup`` needs to be passed to the ``Template`` object.
 
 
-.. literalinclude:: examples/mako_basic/main.py
+.. literalinclude:: mako_basic/main.py
     :caption: mako_basic/main.py
     :language: python

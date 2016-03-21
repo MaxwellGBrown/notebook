@@ -13,10 +13,10 @@ Note that examples for this package may reference :ref:`mako <mako>` templating 
 .. toctree::
     :maxdepth: 1
 
-    examples/wtforms_dynamic_select_fields/dynamic_select_fields
-    examples/wtforms_dynamic_field_list/dynamic_field_list
-    examples/validating_inline_edits/validating_inline_edits
-    examples/form_as_separate_template/form_as_separate_template
+    ../examples/wtforms_dynamic_select_fields/dynamic_select_fields
+    ../examples/wtforms_dynamic_field_list/dynamic_field_list
+    ../examples/validating_inline_edits/validating_inline_edits
+    ../pyramid/form_as_separate_template/form_as_separate_template
 
 
 ----------

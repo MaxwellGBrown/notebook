@@ -35,9 +35,9 @@ Now the view needs to be changed to use a template.
 Since the app now uses ``pyramid_mako`` to render responses, instead of sending the content from the ``view`` to the client, the ``view`` sends the template (defined in ``view_config(renderer='templates/hello.mako')`` the blocks of information needed to render the page's content.
 
 
-.. literalinclude:: basic_app/template/hello.mako
+.. literalinclude:: basic_app/templates/hello.mako
     :language: html
-    :caption: template/hello.mako
+    :caption: Basic template for pyramid
 
 
 Alternatively, one could render the template and return a ``Response`` object instead of linking the ``view`` to a template in ``view_config``.
