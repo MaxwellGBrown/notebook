@@ -4,7 +4,7 @@
 argparse
 ========
 
-`argparse <https://docs.python.org/3/library/argparse.html>`_ is a package used to parse command-line arguments. Use it to spice-up your scripts!
+`argparse <https://docs.python.org/3/library/argparse.html>`__ is a package used to parse command-line arguments. Use it to spice-up your scripts!
 
 ----------
 Quickstart
@@ -14,8 +14,8 @@ argparse at the highest level is a pretty straight-forward package.
 
 All you have to do is define an ``ArgumentParser``, add some arguments using ``ArgumentParser.add_argument()``, and then call ``ArgumentParser.parse_args()``. 
 
-``ArgumentParser``'s initialization/customization arguments `can be found here <https://docs.python.org/3/library/argparse.html#argumentparser-objects>`_
-``ArgumentParser.add_argument()``'s args & kwargs `can be found here <https://docs.python.org/3/library/argparse.html#the-add-argument-method>`_
+``ArgumentParser``'s initialization/customization arguments `can be found here <https://docs.python.org/3/library/argparse.html#argumentparser-objects>`__
+``ArgumentParser.add_argument()``'s args & kwargs `can be found here <https://docs.python.org/3/library/argparse.html#the-add-argument-method>`__
 
 .. code-block:: python
 

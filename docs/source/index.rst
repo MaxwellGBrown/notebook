@@ -33,7 +33,7 @@ Many examples will have functional code examples in ``docs/source/python_librari
    :maxdepth: 1 
    :glob:
 
-   python_libraries/argparse
+   argparse <python_libraries/argparse/argparse>
    python_libraries/fabric
    python_libraries/imaplib
    python_libraries/mailthon
