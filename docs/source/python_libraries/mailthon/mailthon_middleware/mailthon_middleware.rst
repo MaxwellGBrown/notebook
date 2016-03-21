@@ -1,3 +1,5 @@
+.. _mailthon_middleware:
+
 ===================
 Mailthon Middleware
 ===================

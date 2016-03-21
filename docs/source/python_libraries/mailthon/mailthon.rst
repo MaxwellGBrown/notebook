@@ -1,3 +1,5 @@
+.. _mailthon:
+
 ========
 mailthon
 ========
@@ -9,10 +11,10 @@ mailthon is an SMTP library that reflects the simplicty of the requets library.
 .. toctree::
    :maxdepth: 1
    
-   examples/mailthon_enclosure/mailthon_enclosure
-   examples/mailthon_headers/mailthon_headers
-   examples/mailthon_middleware/mailthon_middleware
-   examples/mailthon_and_email/mailthon_and_email
+   mailthon_enclosure/mailthon_enclosure
+   mailthon_headers/mailthon_headers
+   mailthon_middleware/mailthon_middleware
+   mailthon_and_email/mailthon_and_email
      
 
 

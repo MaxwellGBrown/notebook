@@ -1,3 +1,5 @@
+.. _mailthon_and_email:
+
 =======================================
 Mailthon and the Standard Email Library
 =======================================
