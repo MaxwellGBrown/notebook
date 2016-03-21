@@ -34,6 +34,7 @@ Many examples will have functional code examples in ``docs/source/python_librari
    :glob:
 
    argparse <python_libraries/argparse/argparse>
+   csv <python_libraries/csv/csv>
    fabric <python_libraries/fabric/fabric>
    imaplib <python_libraries/imaplib/imaplib>
    mailthon <python_libraries/mailthon/mailthon>
