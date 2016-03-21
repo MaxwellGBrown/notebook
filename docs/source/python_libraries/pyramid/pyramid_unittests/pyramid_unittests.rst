@@ -36,5 +36,4 @@ Also, the desired result should not be a super-exact set of requirements. Tests 
 Testing Controllers
 -------------------
 
-To see how to incorporate ``unittest`` with ``pyramid``-style controllers see :ref:`Unit Tests for the Controller <unit_tests_for_the_controller>`.
-
+See :ref:`Unit Tests for the Controller <unit_tests_for_the_controller>`.
