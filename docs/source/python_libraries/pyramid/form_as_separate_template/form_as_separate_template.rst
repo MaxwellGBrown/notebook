@@ -94,12 +94,12 @@ Below is a full include of the example files.
 
 .. literalinclude:: form_as_separate_template.py
    :language: python
-   :caption: form_as_separate_template.py
+   :caption: form_as_separate_template.py (Webapp & view callables)
 
 .. literalinclude:: index.mako
    :language: mako
-   :caption: index.mako
+   :caption: index.mako (HTML page template)
 
 .. literalinclude:: form.mako
    :language: mako
-   :caption: form.mako
+   :caption: form.mako (Form template)

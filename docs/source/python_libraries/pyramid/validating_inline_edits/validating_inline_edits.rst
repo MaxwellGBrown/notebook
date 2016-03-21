@@ -51,7 +51,7 @@ With a constructed model and a form to match a model object, we can use X-Editab
 
 .. literalinclude:: inline_app/views.py
     :language: python
-    :caption: inline_app/views.py
+    :caption: Changing a single Field.data in a wtforms.Form
     :emphasize-lines: 10-12, 15 
     :lines: 25-51
 
@@ -80,9 +80,9 @@ Full Example
 
 .. literalinclude:: inline_app/views.py
   :language: python
-  :caption: inline_app/views.py
+  :caption: Inline Edit Views (inline_app/views.py)
 
 
 .. literalinclude:: inline_app/templates/index.mako
   :language: mako
-  :caption: inline_app/templates/index.mako
+  :caption: Inline Edit Template (inline_app/templates/index.mako)

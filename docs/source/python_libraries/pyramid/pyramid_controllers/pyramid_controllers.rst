@@ -1,3 +1,5 @@
+.. _pyramid_controllers:
+
 ========================
 Pylons-style controllers
 ========================
@@ -13,7 +15,7 @@ To group logically related views into a class there are two decorators that can 
 
 .. literalinclude:: basic_app/views.py
     :language: python
-    :caption: basic_app/views.py
+    :caption: Controller style view callables (basic_app/views.py)
     :emphasize-lines: 4, 9, 13
 
 
@@ -32,7 +34,7 @@ Because there are multiple views now, there needs to be additional routes in the
 
 .. literalinclude:: basic_app/setup_app.py
     :language: python
-    :caption: basic_app/setup_app.py
+    :caption: Add new routes to Configurator
 
 
 Now in the ``Configurator`` there are two defined routes that match the routes defined by the ``view_config()`` decorators:
@@ -52,13 +54,15 @@ The default template for the Controller
     :caption: basic_app/templates/home.mako
 
 
+.. _unit_tests_for_the_controller:
 
-unittests for the Controller
-----------------------------
+Unit Tests for the Controller
+-----------------------------
 
-Setting up unit tests to run with Controller style views requires a little extra work. Instead of running a request through a view function, the Controller class needs to be initialized with the request and then the view method needs to be called.
+To complete unit tests on controllers, a little more work needs to be done.
 
-Functional tests don't change at all, because with functional tests, you're sending a path to the application to handle, not to a python function.
+* Obstantiate the controller with the request
+* Call the controller method to get a WSGI response
 
 
 .. literalinclude:: basic_app/tests.py
@@ -66,4 +70,4 @@ Functional tests don't change at all, because with functional tests, you're send
     :caption: basic_app/tests.py
     :emphasize-lines: 16-18, 25-27  
 
-
+Functional tests don't change at all, because with functional tests, you're sending a path to the application to handle, not to a python function.

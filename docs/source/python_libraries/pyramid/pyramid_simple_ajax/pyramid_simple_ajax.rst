@@ -101,8 +101,8 @@ Full Example
 
 .. literalinclude:: basic_app/templates/index.mako
   :language: html
-  :caption: basic_app/templates/index.mako
+  :caption: basic_app/templates/index.mako (basic page template)
 
 .. literalinclude:: basic_app/views.py
   :language: python
-  :caption: basic_app/views.py
+  :caption: basic_app/views.py (ajax & non-ajax view callables)

@@ -1,3 +1,5 @@
+.. _pyramid_unittest:
+
 ====================
 Testing with Pyramid
 ====================
@@ -10,7 +12,7 @@ Writing Unit Tests for Pyramid
 
 .. literalinclude:: basic_app/tests.py
     :language: python
-    :caption: basic_app/tests.py
+    :caption: unittests w/ pyramid (basic_app/tests.py)
 
 
 There are a few interesting things to note in our ``tests.py`` file:
@@ -34,20 +36,5 @@ Also, the desired result should not be a super-exact set of requirements. Tests 
 Testing Controllers
 -------------------
 
-To complete unit tests on controllers, a little more work needs to be done.
-
-* Obstantiate the controller with the request
-* Call the controller method to get a WSGI response
-
-.. code-block:: python
-
-    from pyramid import testing    
-
-    from .views import BasicAppViews
-
-    request = testing.DummyRequest()
-    controller = BasicAppViews(request)
-    response = controller.home()
-    # test the data returned from the controller
-    assert "Hello World" in response
+To see how to incorporate ``unittest`` with ``pyramid``-style controllers see :ref:`Unit Tests for the Controller <unit_tests_for_the_controller>`.
 

@@ -12,13 +12,13 @@ Pyramid is the *microframework* child of ``pylons`` and ``repoze.bfg``. Use it t
   :maxdepth: 1
 
   pyramid_templating/pyramid_templating
-  ../examples/pyramid_controllers/pyramid_controllers
-  ../examples/pyramid_unittests/pyramid_unittests
-  ../examples/pyramid_database_setup/pyramid_database_setup
+  pyramid_controllers/pyramid_controllers
+  pyramid_unittests/pyramid_unittests
+  pyramid_database_setup/pyramid_database_setup
   form_as_separate_template/form_as_separate_template 
-  examples/pyramid_simple_ajax/pyramid_simple_ajax
-  Inline Edits with X-Editable <../examples/validating_inline_edits/validating_inline_edits>
-  AJAX Tables with DataTables <../examples/pyramid_datatables_ajax/pyramid_datatable>
+  pyramid_simple_ajax/pyramid_simple_ajax
+  Inline Edits with X-Editable <validating_inline_edits/validating_inline_edits>
+  AJAX Tables with DataTables <pyramid_datatables_ajax/pyramid_datatable>
 
   
 ----------
@@ -37,7 +37,7 @@ In the 1-file WSGI app below, ``main()`` is constructing the WSGI app and ``hell
 
 .. literalinclude:: pyramid_single_file_app/single_file_app.py
     :language: python
-    :caption: single_file_app.py
+    :caption: a simple single file web app
 
 
 Running ``python helloworld.py`` will spin up the server and ``main()`` builds and configures the routes of the WSGI app using ``pyramid``. Upon request, the ``hello_world(request)`` controller/function is triggered and returns ``"Hello"`` as it's response.
@@ -55,7 +55,7 @@ WSGI apps are made to be portable. ``pyramid`` makes packaging apps up easy, and
 
 .. literalinclude:: pyramid_basic_app/setup.py
     :language: python
-    :caption: setup.py
+    :caption: a basic pyramid setup.py
     :emphasize-lines: 8, 12
 
 ``setup.py``'s job is to create the egg file of our application. This egg file can be used to distribute the application and easy installation. The name of the egg will be ``basic_app.egg-info``.
@@ -71,7 +71,7 @@ Either way, the application needs an ``__init__.py`` for pythonic imports!
 
 .. literalinclude:: pyramid_basic_app/basic_app/__init__.py
     :language: python
-    :caption: basic_app/__init__.py
+    :caption: a pyramid webapp's __init__.py
 
 
 In this example, since ``setup.py`` points to ``basic_app.setup_app:main``, the ``main()`` function, which returns the WSGI app, needs to be defined.
@@ -79,7 +79,7 @@ In this example, since ``setup.py`` points to ``basic_app.setup_app:main``, the 
 
 .. literalinclude:: pyramid_basic_app/basic_app/setup_app.py
     :language: python
-    :caption: basic_app/setup_app.py
+    :caption: point the setup.py to app creation function
 
 
 Again, the function of this file is to create a WSGI app and serve it!
@@ -93,7 +93,7 @@ Note that ``config.add_view()`` has been replaced with ``config.scan()``. This s
 
 .. literalinclude:: pyramid_basic_app/basic_app/views.py
     :language: python
-    :caption: basic_app/views.py
+    :caption: simple views setup for pyramid
 
 
 ``views.py`` is leveraging the ``pyramid.view.view_config`` wrapper function to define this function as a view for the path ``'hello'`` which is defined as a route in our ``Configurator`` object in ``basic_app/setup_app.py``. 
@@ -112,7 +112,7 @@ The ``.ini`` file works in conjunction with pyramid's ``pserve`` command, which 
 
 .. literalinclude:: pyramid_basic_app/development.ini
     :language: ini
-    :caption: development.ini
+    :caption: basic pyramid app .ini file
 
 
 ``[app:main]`` refers to the egg created from ``setup.py`` where ``main`` refers to ``entry_points="[paste.app_factory] main = basic_app.setup_app:main``. Remember, that exact line is referring the function in the app that returns the WSGI app. 

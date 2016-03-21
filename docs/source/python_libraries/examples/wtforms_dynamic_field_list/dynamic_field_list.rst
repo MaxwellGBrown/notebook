@@ -1,4 +1,6 @@
-﻿========================
+﻿.. _dynamic_field_list:
+
+========================
 Dynamic One-To-Many Form
 ========================
 
@@ -92,8 +94,8 @@ Below is the rest of the example that runs ``dynamic_field_list.py``
 
 .. literalinclude:: app.py
    :language: python
-   :caption: app.py
+   :caption: app.py (webapp & view callables)
 
 .. literalinclude:: form.mako
    :language: mako
-   :caption: form.mako
+   :caption: form.mako (page & form template)

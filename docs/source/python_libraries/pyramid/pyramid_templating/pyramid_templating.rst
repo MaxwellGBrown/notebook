@@ -19,7 +19,7 @@ After that, the application ``Configurator`` needs to know the templating tool b
 
 .. literalinclude:: basic_app/setup_app.py
     :language: python
-    :caption: basic_app/setup_app.py
+    :caption: Include pyramid_mako in Configurator
     :emphasize-lines: 7 
 
 
@@ -28,7 +28,7 @@ Now the view needs to be changed to use a template.
 
 .. literalinclude:: basic_app/views.py
     :language: python
-    :caption: basic_app/views.py
+    :caption: Simple view_config for rendering mako template
     :emphasize-lines: 4
 
 

@@ -1,3 +1,5 @@
+.. _unittest:
+
 ========
 unittest
 ========
@@ -7,8 +9,8 @@ unittest
 .. toctree::
     :maxdepth: 1
 
-    examples/unittest_assert_methods/unittest_assert_methods
-    examples/pyramid_unittests/pyramid_unittests
+    unittest_assert_methods/unittest_assert_methods
+    ../pyramid/pyramid_unittests/pyramid_unittests
 
 Developers can use ``nose`` or ``py.test`` frameworks to run developer defined unittests.
 
@@ -65,9 +67,9 @@ For any other tests that aren't tested via assert statements, one can call ``Tes
 
 Below is an example of how using ``TestCase`` can provide a healthy environment to create unit tests:
 
-.. literalinclude:: examples/unittest_basic_tests/unittest_basic_tests.py
+.. literalinclude:: unittest_basic_tests/unittest_basic_tests.py
     :language: python
-    :caption: unittest_basic_tests.py
+    :caption: A basic unittest file (unittest_basic_tests.py)
 
 Using ``nose``, the test cases within the test fixture are automatically detected. There's no work that has to be done to run the tests in the correct fashion.
 

@@ -38,11 +38,11 @@ Many examples will have functional code examples in ``docs/source/python_librari
    imaplib <python_libraries/imaplib/imaplib>
    mailthon <python_libraries/mailthon/mailthon>
    mako <python_libraries/mako/mako>
-   python_libraries/unittest
+   unittest <python_libraries/unittest/unittest>
    python_libraries/paramiko
    python_libraries/pymongo
    pyramid <python_libraries/pyramid/pyramid>
-   python_libraries/wtforms
+   wtforms <python_libraries/wtforms/wtforms>
 
 
 --------------------
