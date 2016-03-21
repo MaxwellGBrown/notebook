@@ -35,7 +35,7 @@ Many examples will have functional code examples in ``docs/source/python_librari
 
    argparse <python_libraries/argparse/argparse>
    fabric <python_libraries/fabric/fabric>
-   python_libraries/imaplib
+   imaplib <python_libraries/imaplib/imaplib>
    python_libraries/mailthon
    python_libraries/mako
    python_libraries/unittest
