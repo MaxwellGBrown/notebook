@@ -1,3 +1,5 @@
+.. _programming_with_fabric:
+
 ============================
 Using fabric programatically
 ============================

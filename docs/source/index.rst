@@ -34,7 +34,7 @@ Many examples will have functional code examples in ``docs/source/python_librari
    :glob:
 
    argparse <python_libraries/argparse/argparse>
-   python_libraries/fabric
+   fabric <python_libraries/fabric/fabric>
    python_libraries/imaplib
    python_libraries/mailthon
    python_libraries/mako

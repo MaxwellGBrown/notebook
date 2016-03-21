@@ -1,3 +1,5 @@
+.. _example_fabfile:
+
 ===================
 Using fab & fabfile
 ===================
@@ -8,7 +10,7 @@ Below is an example ``fabfile.py``:
 
 .. literalinclude:: fabfile.py
     :language: python
-    :caption: fabfile.py
+    :caption: An example fabfile.py
 
 Although this ``fabfile`` is trivial, it can provide a good enough example to explain what fab was made for.
 

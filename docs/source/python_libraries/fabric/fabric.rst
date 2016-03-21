@@ -1,10 +1,12 @@
+.. _fabric:
+
 ======
 fabric
 ======
 
 .. warning::
 
-   As of Dec 3, 2015 fabric has not yet been ported to Python 3!
+   As of Mar 21, 2016 fabric has not yet been ported to Python 3!
 
 ``fabric`` is a Python (2.5-2.7) library for streamlining SSH for application deployment or system admin tasks.  It provides a basic suite of commands for local or remote shell commands.
 
@@ -14,8 +16,8 @@ fabric
 .. toctree::
   :maxdepth: 1
 
-  examples/example_fabfile/example_fabfile
-  examples/programming_with_fabric/programming_with_fabric
+  example_fabfile/example_fabfile
+  programming_with_fabric/programming_with_fabric
 
 
 
@@ -27,7 +29,7 @@ A small, yet complete, fabfile
 ------------------------------
 
 .. code-block:: python
-    :caption: fabfile.py
+    :caption: A simple fabfile.py
 
     from fabric.api import run
 
