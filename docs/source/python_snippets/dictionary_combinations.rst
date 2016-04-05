@@ -53,9 +53,9 @@ of each key's values (which is assumed to be an iterable).
   
           # generate all subcombinations of the value
           for value in values:
-              partial = OrderedDict()
-              partial[this_key] = value
               for combo in dict_combinations(this_dict):
+                  partial = OrderedDict()
+                  partial[this_key] = value
                   partial.update(combo)
                   yield partial
 
