@@ -21,7 +21,7 @@ All you have to do is define an ``ArgumentParser``, add some arguments using ``A
 
   import argparse
 
-  def main(args):
+  def main(**kwargs):
       print("argument1: ", args.argument1)
       print("--flag1/-f was used: ", args.first_flag)
 
@@ -33,10 +33,12 @@ All you have to do is define an ``ArgumentParser``, add some arguments using ``A
               default=False)
 
       args = parser.parse_args()  # auto-magically gathers command-line args
+      args_dict = vars(args)  # parser.parse_args returns a Namespace. This is a dict
+      return dict(args_dict)
 
   if __name__ == "__main__":
-      args = parse_args()
-      main(args)
+      args_dict = parse_args()
+      main(**args_dict)
 
 
 
