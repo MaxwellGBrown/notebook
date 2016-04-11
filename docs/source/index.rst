@@ -43,6 +43,7 @@ Many examples will have functional code examples in ``docs/source/python_librari
    paramiko <python_libraries/paramiko/paramiko>
    pymongo <python_libraries/pymongo/pymongo>
    pyramid <python_libraries/pyramid/pyramid>
+   sqlalchemy <python_libraries/sqlalchemy/sqlalchemy>
    wtforms <python_libraries/wtforms/wtforms>
 
 
