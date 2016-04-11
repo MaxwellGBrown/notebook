@@ -26,6 +26,13 @@ To start w/ pytest, first write a test! Pytest has pretty good test discovery. T
       assert True
 
 
+To run tests, head to the command line and enter::
+
+  $ py.test
+
+It's that easy!
+
+
 Logically it may make sense to group tests into classes. pytest is totally down with this.
 
 .. code-block:: python
