@@ -9,7 +9,7 @@ pytest is a unit-testing framework. Use it to write & run unit tests.
 **Examples**
 
 .. toctree::
-  :maxdepth: 1
+  :maxdepth: 2
 
   Fixtures <pytest_fixtures/fixtures>
 
@@ -44,4 +44,4 @@ Logically it may make sense to group tests into classes. pytest is totally down 
 
 Really there's much much more to working with pytest, but this here is the it at it's most basic.
 
-For more in-depth, look into defining
+For more in-depth, look into :ref:`defining fixtures <pytest_fixtures>`

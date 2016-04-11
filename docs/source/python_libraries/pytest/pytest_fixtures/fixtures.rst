@@ -126,6 +126,7 @@ command line ``$ py.test -v -s``.
    separate.
 
 
+----------------
 Nesting Fixtures
 ----------------
 
@@ -175,6 +176,7 @@ For a full in-depth example of this, :download:`check out this file<./nested_fix
    matching.
 
 
+----------------------
 Parameterized Fixtures
 ----------------------
 
