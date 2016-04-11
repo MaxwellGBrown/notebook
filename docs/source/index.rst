@@ -33,6 +33,7 @@ Many examples will have functional code examples in ``docs/source/python_librari
    :maxdepth: 1 
    :glob:
 
+   alembic <python_libraries/alembic/alembic>
    argparse <python_libraries/argparse/argparse>
    csv <python_libraries/csv/csv>
    fabric <python_libraries/fabric/fabric>

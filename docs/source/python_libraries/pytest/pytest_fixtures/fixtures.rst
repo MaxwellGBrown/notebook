@@ -126,6 +126,8 @@ command line ``$ py.test -v -s``.
    separate.
 
 
+.. _pytest_nested_fixtures:
+
 ----------------
 Nesting Fixtures
 ----------------
