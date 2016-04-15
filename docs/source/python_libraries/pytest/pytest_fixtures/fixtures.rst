@@ -64,11 +64,13 @@ Scope declaration also allows the ability to "teardown" fixtures, which is done 
 Below is a light example of setting this up:
 
 .. code-block:: python
+  :emphasize-lines: 5,23
 
   import pytest
 
   @pytest.fixture(scope="class")
   def class_fixture(request):
+      request.cls.foo = "bar"
       # setUp
 
       def teardown_class_fixture():
@@ -85,8 +87,8 @@ Below is a light example of setting this up:
       def setup_method(self, method):
           pass
 
-      def test_this(self, request):
-          assert True
+      def test_this(self):
+          assert self.foo == "bar"
 
 
 The available operatable scopes are:
@@ -178,9 +180,9 @@ For a full in-depth example of this, :download:`check out this file<./nested_fix
    matching.
 
 
-----------------------
-Parameterized Fixtures
-----------------------
+-----------------------------------
+Parameterized Fixtures & Test Cases
+-----------------------------------
 
 A fixture can be set up to run with different parameters, so that a new test
 will be created for each supplied parameter.
@@ -195,7 +197,17 @@ appropriate for the fixture scope.
         return request.param
 
 
-    @pytest.mark.usefixture("param_fixture")
-    def test_param_fixture(request):
-        print(request._funcargs['param_fixture'])
-        assert True
+    # param_fixture is results of parametrized fixture
+    def test_param_fixture(param_fixture):
+        assert param_fixture.startswith("param")
+
+
+    # param_fixture is the params supplied below. This IS NOT run through fixture
+    @pytest.mark.parameterize("param_fixture", [1, 2, 3])
+    def test_override_param_fixture(param_fixture):
+        assert isinstance(param_fixture, int)
+
+    # parametrization
+    @pytest.mark.parameterize("not_a_fixture", ['a', 'b', 'c', 'd'])
+    def test_parametrized_test_case(not_a_fixture):
+        assert not_a_fixture in "abcd"
