@@ -14,6 +14,8 @@ These examples demonstrate some ways to make pyramid play nicely with `Bootstrap
 .. toctree::
    :maxdepth: 1
 
+   pyramid_bootstrap_active_nav/pyramid_bootstrap_active_nav
+
 
 Quickstart
 ----------
