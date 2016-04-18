@@ -57,15 +57,15 @@
 	</p>
   </div>
 
-<script>
-  $(document).ready(function(){
-    $("#navigation li a").each(function(){
-      if($(this).attr('href') == window.location.href){
-        $(this).parent().addClass("active");
-      };
-    })
-  });
-</script>
+  <script>
+    $(document).ready(function(){
+      $("#navigation li a").each(function(){
+        if($(this).attr('href') == window.location.href){
+          $(this).parent().addClass("active");
+        };
+      })
+    });
+  </script>
 
 </div>
 
