@@ -15,9 +15,12 @@ Pyramid is the *microframework* child of ``pylons`` and ``repoze.bfg``. Use it t
   pyramid_controllers/pyramid_controllers
   pyramid_unittests/pyramid_unittests
   pyramid_database_setup/pyramid_database_setup
-  form_as_separate_template/form_as_separate_template 
+
   pyramid_simple_ajax/pyramid_simple_ajax
+  form_as_separate_template/form_as_separate_template 
   Inline Edits with X-Editable <validating_inline_edits/validating_inline_edits>
+
+  Pyramid & Bootstrap <pyramid_bootstrap/pyramid_bootstrap>
   AJAX Tables with DataTables <pyramid_datatables_ajax/pyramid_datatable>
 
   
