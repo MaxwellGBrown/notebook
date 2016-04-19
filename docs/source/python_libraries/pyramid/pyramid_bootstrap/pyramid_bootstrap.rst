@@ -15,6 +15,8 @@ These examples demonstrate some ways to make pyramid play nicely with `Bootstrap
    :maxdepth: 1
 
    pyramid_bootstrap_active_nav/pyramid_bootstrap_active_nav
+   bootstrap_form_messages/bootstrap_form_messages
+   Bootstrap Progress Bar w/ Simple Ajax<../pyramid_simple_ajax/pyramid_simple_ajax>
 
 
 Quickstart

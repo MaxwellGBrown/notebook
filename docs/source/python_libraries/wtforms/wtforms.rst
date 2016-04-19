@@ -15,6 +15,7 @@ Note that examples for this package may reference :ref:`mako <mako>` templating 
 
     wtforms_dynamic_select_fields/dynamic_select_fields
     wtforms_dynamic_field_list/dynamic_field_list
+    WTForms & Bootstrap Validation States<../pyramid/pyramid_bootstrap/bootstrap_form_messages/bootstrap_form_messages>
     ../pyramid/validating_inline_edits/validating_inline_edits
     ../pyramid/form_as_separate_template/form_as_separate_template
 
