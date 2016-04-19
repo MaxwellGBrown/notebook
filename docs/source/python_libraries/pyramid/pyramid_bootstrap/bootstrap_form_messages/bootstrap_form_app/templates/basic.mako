@@ -34,11 +34,11 @@
     ${make_form_group(form, "username")}
     ${make_form_group(form, "email")}
     ${make_form_group(form, "password")}
-	<div class="form-group">
-	  <div class="col-sm-offset-2 col-sm-10">
-	    <button type="submit" class="btn btn-default">Submit</button>
-	  </div>
-	</div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="btn btn-default">Submit</button>
+      </div>
+    </div>
   </form>
 
 </div>
