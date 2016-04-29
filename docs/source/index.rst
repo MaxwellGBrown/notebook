@@ -63,6 +63,8 @@ Most/all solutions here are cut & paste solutions.
    :glob:
 
    python_snippets/dictionary_combinations
+   python_snippets/ordereddefaultdict
+   python_snippets/autovivification
 
 
 --------------------
