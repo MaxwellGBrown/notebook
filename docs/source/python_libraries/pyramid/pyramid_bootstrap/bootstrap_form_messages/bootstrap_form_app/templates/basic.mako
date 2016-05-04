@@ -31,9 +31,9 @@
   <p class="text-center">${message}</p>
 
   <form class="form-horizontal" action="${request.route_url('index')}" method="POST">
-    ${make_form_group(form, "username")}
-    ${make_form_group(form, "email")}
-    ${make_form_group(form, "password")}
+    ${make_form_group(form.username)}
+    ${make_form_group(form.email)}
+    ${make_form_group(form.password)}
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
         <button type="submit" class="btn btn-default">Submit</button>
@@ -47,9 +47,8 @@
 
 </html>
 
-<%def name="make_form_group(form, fieldname)">
+<%def name="make_form_group(field)">
 <%
-    field = getattr(form, fieldname)
     if field.errors:
         div_class = "form-group has-error"
     else:

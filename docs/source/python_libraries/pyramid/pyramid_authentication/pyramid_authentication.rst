@@ -1,8 +1,19 @@
+.. _pyramid_auth:
+
 ======================================
 Pyramid Authentication & Authorization
 ======================================
 
 Authentication & Authorization are important features for web applications. They allow one to restrict access to certain pages based on their authorization.
+
+**Advanced Pyramid Auth Examples**
+
+.. toctree::
+   :maxdepth: 2
+
+   ../pyramid_authentication_with_database/full_pyramid_auth.rst
+
+
 
 While both are closely related (and can be abbreviated as 'auth'), Authentication & Authorization have important distinctions:
 
@@ -318,9 +329,3 @@ a custom "forbidden view callable".
 
 Now when an app user gets a 403, they'll be served the ``forbidden(request)``
 view callable!
-
-
-Summary
--------
-
-
