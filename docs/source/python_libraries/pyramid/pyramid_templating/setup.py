@@ -6,10 +6,10 @@ requires = [
 ]
 
 setup(
-        name="basic_app",
+        name="template_app",
         install_requires=requires,
         entry_points="""\
         [paste.app_factory]
-        main = basic_app.setup_app:main
+        main = template_app.app_config:main
         """,
 )
