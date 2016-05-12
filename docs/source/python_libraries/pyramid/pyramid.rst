@@ -16,6 +16,7 @@ Pyramid is the *microframework* child of ``pylons`` and ``repoze.bfg``. Use it t
   pyramid_unittests/pyramid_unittests
   pyramid_database_setup/pyramid_database_setup
   pyramid_authentication/pyramid_authentication
+  pyramid_traversal_vs_dispatch/pyramid_traversal_vs_dispatch
 
   pyramid_simple_ajax/pyramid_simple_ajax
   form_as_separate_template/form_as_separate_template 
