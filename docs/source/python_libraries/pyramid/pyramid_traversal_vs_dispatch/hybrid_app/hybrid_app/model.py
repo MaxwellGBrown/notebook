@@ -23,34 +23,33 @@ def bind_engine(engine, create_all=False):
         Base.metadata.create_all(engine)
 
 
-class RootFactory(object):
-    __name__ = None
-    __parent__ = None
-
-    def __init__(self, request):
-        print("RootFactory.__init__")
-        self.request = request
-
-    def __getitem__(self, key):
-        print('RootFactory["{}"]'.format(key))
-        if key == "foo_tree":
-            return FooFactory(parent=self)
-        else:
-            raise KeyError()
-
-    def __repr__(self):
-        return 'RootFactory(__name__={}, __parent__={})'\
-                .format(self.__name__.__repr__(), self.__parent__)
+# class RootFactory(object):
+#     __name__ = None
+#     __parent__ = None
+# 
+#     def __init__(self, request):
+#         print("RootFactory.__init__")
+#         self.request = request
+# 
+#     def __getitem__(self, key):
+#         print('RootFactory["{}"]'.format(key))
+#         if key == "foo_tree":
+#             return FooFactory(parent=self)
+#         else:
+#             raise KeyError()
+# 
+#     def __repr__(self):
+#         return 'RootFactory(__name__={}, __parent__={})'\
+#                 .format(self.__name__.__repr__(), self.__parent__)
 
 
 class FooFactory(object):
     __acl__ = list()
-    __name__ = "foo_tree"
+    __name__ = None
+    __parent__ = None
 
-    def __init__(self, parent=RootFactory(None)):
-        if parent.request is not None:
-            print("FooFactory.__init__ by RootFactory")
-        self.__parent__ = parent
+    def __init__(self, *args):
+        pass
 
     def __getitem__(self, key):
         try:

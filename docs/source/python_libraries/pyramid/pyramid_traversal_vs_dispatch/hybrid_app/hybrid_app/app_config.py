@@ -13,14 +13,39 @@ def main(global_config, **settings):
     engine = engine_from_config(configuration=settings, prefix="sqlalchemy.")
     app_model.bind_engine(engine, create_all=True)
 
-    # Traversal works on the assumption of one great resource tree that
-    # begins w/ the RootFactory.
-    config.set_root_factory(app_model.RootFactory)
+    config.add_route("index", pattern="/")
 
-    # All traversal views are matched by "view_name" and context which is 
-    # declared in @view_config(name="", context=cls_obj)
-    # The last piece of the URL that does not match a resource is used as the
-    # view_name.
+    # using *traverse, urls are completed by traversing the object factory
+    config.add_route("view", pattern="/view*traverse",
+            factory=app_model.FooFactory, traverse="*traverse")
+
+    # config.add_route("new", pattern="/new*traverse",
+    #         factory=app_model.FooFactory, traverse="*traverse")
+
+    config.add_route("new_foo", pattern="/new", factory=app_model.FooFactory)
+    config.add_route("new_bar", pattern="/{foo_name}/new",
+            factory=app_model.FooFactory, traverse="/{foo_name}")
+    config.add_route("new_baz",
+            pattern="/{foo_name}/{bar_name}/new",
+            factory=app_model.FooFactory,
+            traverse="/{foo_name}/{bar_name}")
+    config.add_route("new_qux",
+            pattern="/{foo_name}/{bar_name}/{baz_name}/new",
+            factory=app_model.FooFactory,
+            traverse="/{foo_name}/{bar_name}/{baz_name}")
+
+
+    # # special traversal sections can be provided also
+    # config.add_route("new_foo", pattern="/new", factory=app_model.FooFactory)
+    # config.add_route("new_bar", pattern="/{foo_name}/new",
+    #         factory=app_model.FooFactory, traverse="/{foo_name}")
+    # config.add_route("new_baz", pattern="/{foo_name}/{bar_name}/new",
+    #         factory=app_model.FooFactory, traverse="/{foo_name}/{bar_name}")
+    # config.add_route("new_qux",
+    #         pattern="/{foo_name}/{bar_name}/{baz_name}/new",
+    #         factory=app_model.FooFactory,
+    #         traverse="/{foo_name}/{bar_name}/{baz_name}",
+    #         )
 
     config.scan()
     return config.make_wsgi_app()

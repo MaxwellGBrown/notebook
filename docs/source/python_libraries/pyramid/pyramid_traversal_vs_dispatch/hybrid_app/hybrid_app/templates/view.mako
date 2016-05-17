@@ -28,11 +28,13 @@
       % if request.context.__parent__ is not None:
         <b>__parent__</b>:
 		% if request.context.__parent__.__name__ is not None:
-		  <a href="${request.resource_url(request.context.__parent__, 'view')}">
+		  <a href="${request.resource_url(request.context.__parent__,
+		  route_name='view')}">
 		    ${request.context.__parent__.__name__ or repr(request.context.__parent__)}
 		  </a>
 		% else:
-		  <a href="${request.resource_url(request.context.__parent__)}">
+		  <a href="${request.resource_url(request.context.__parent__,
+		  route_name='view')}">
 		    ${request.context.__parent__.__repr__()}
 		  </a>
 		% endif
@@ -49,7 +51,15 @@
 
   % if hasattr(request.context, '__getitem__'):
     <h2>Add Child</h2>
-    <form action="${request.resource_url(request.context, 'new')}" method="POST">
+	% if str(type(request.context)).find("FooFactory") > -1:
+      <form action="${request.route_url('new_foo')}" method="POST">
+	% elif str(type(request.context)).find("Foo") > -1:
+      <form action="${request.route_url('new_bar', foo_name=request.context.foo_name)}" method="POST">
+	% elif str(type(request.context)).find("Bar") > -1:
+      <form action="${request.route_url(route_name='new_baz', foo_name=request.context.foo_name, bar_name=request.context.bar_name)}" method="POST">
+	% else:
+      <form action="${request.route_url(route_name='new_qux', foo_name=request.context.foo_name, bar_name=request.context.bar_name, baz_name=request.context.baz_name)}" method="POST">
+	% endif
       <input name="name" placeholder="name"/>
       <input type="submit"/>
     </form>
@@ -72,7 +82,7 @@
   <ul>
     % for child in parent.children():
 	  <li>
-	    <a href="${request.resource_url(child, 'view')}">
+	    <a href="${request.resource_url(child, route_name='view')}">
 		  ${child.__name__}
 		</a>
 		${list_children(child)}

@@ -1,40 +1,22 @@
 <html>
 <head>
-    <title>Traversal App</title>
+    <title>Hybrid Traversal App</title>
 </head>
 <body>
 <div>
-    <h1>Traversal App Index</h1>
-
-	<h2>request.context: ${request.context.__repr__()}</h2>
+    <h1>Hybrid Traversal App Index</h1>
 	<p>
-	  <b>Traversal</b> maps URLs to view callables by traversing the
-	  <i>resource tree</i> based on the URL. The view is matched to a URL based
-	  on...
-	  </p>
-
-	  <ol>
-	    <li>
-		  The final <i>resource</i> matched in the resource tree. This is the
-		  <i>context</i> in the @view_config.
-		</li>
-	    <li>
-		  The last piece of the URL not used to match a resource, which will
-		  match a <i>view name</i>.
-		</li>
-	  </ol>
-
-      <p>
-	  By clicking the link below, you'll be traversing from the RootFactory to
-	  the resource that matches "foo_tree", which is FooFactory. <br/>
+	  Hybrid Traversal is essentially a Traversal application that leverages
+	  routes to match requests to different RootFactories to operate the
+	  traversal of their resource trees. <br/>
 	  <br/>
-	  RootFactory(request)['foo_tree'] =&#62; FooFactory =&#62; Foo =&#62; Bar =&#62;
-	  Baz =&#62; Qux <br/>
+	  In this example, FooFactory is a separate root_factory that's supplied
+	  specifically for routes that need to traverse, instead of as the
+	  applications root_factory. <br/>
 	  <br/>
-	  <a href="${request.resource_url(request.context['foo_tree'], 'view')}">
-	    Navigate foo_tree via Traversal
-	  </a>
-    </p>
+	  <a href="${request.resource_url(view_root_factory, route_name='view')}">View route_name="view" w/ Hybrid
+	  Traversal!</a>
+	</p>
 </div>
 </body>
 </html>

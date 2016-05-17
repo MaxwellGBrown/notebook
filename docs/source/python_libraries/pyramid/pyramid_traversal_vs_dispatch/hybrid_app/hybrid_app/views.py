@@ -5,13 +5,12 @@ from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 import hybrid_app.model as app_model
 
 
-# since there's no name= or context=, this is the "default view" (aka "/")
-@view_config(renderer="index.mako", context=app_model.RootFactory)
+@view_config(route_name="index", renderer="index.mako")
 def index(request):
-    return {}
+    return {"view_root_factory": app_model.FooFactory()}
 
 
-@view_config(name="view", renderer="view.mako")
+@view_config(route_name="view", renderer="view.mako")
 def view(request):
     print("view - request.context: ", str(request.context.__repr__()))
     return dict()
@@ -30,7 +29,7 @@ def bad_new(request):
             .format( request.params.get('name'))
     return Response(response)
 
-@view_config(name="new", context=app_model.FooFactory)
+@view_config(route_name="new_foo", context=app_model.FooFactory)
 def new_foo(context, request):
     if request.params.get('name') in ['view', 'new']: raise HTTPBadRequest
 
@@ -39,10 +38,10 @@ def new_foo(context, request):
     new_foo = app_model.Foo(**foo_kwargs)
     app_model.Session.add(new_foo)
     app_model.try_commit()
-    raise HTTPFound(request.resource_url(new_foo, "view"))
+    raise HTTPFound(request.resource_url(new_foo, route_name="view"))
 
 
-@view_config(name="new", context=app_model.Foo)
+@view_config(route_name="new_bar", context=app_model.Foo)
 def new_bar(context, request):
     if request.params.get('name') in ['view', 'new']: raise HTTPBadRequest
 
@@ -54,10 +53,10 @@ def new_bar(context, request):
     new_bar = app_model.Bar(**bar_kwargs)
     app_model.Session.add(new_bar)
     app_model.try_commit()
-    raise HTTPFound(request.resource_url(new_bar, "view"))
+    raise HTTPFound(request.resource_url(new_bar, route_name="view"))
 
 
-@view_config(name="new", context=app_model.Bar)
+@view_config(route_name="new_baz", context=app_model.Bar)
 def new_baz(request):
     if request.params.get('name') in ['view', 'new']: raise HTTPBadRequest
 
@@ -70,10 +69,10 @@ def new_baz(request):
     new_baz = app_model.Baz(**baz_kwargs)
     app_model.Session.add(new_baz)
     app_model.try_commit()
-    raise HTTPFound(request.resource_url(new_baz, "view"))
+    raise HTTPFound(request.resource_url(new_baz, route_name="view"))
 
 
-@view_config(name="new", context=app_model.Baz)
+@view_config(route_name="new_qux", context=app_model.Baz)
 def new_qux(request):
     if request.params.get('name') in ['view', 'new']: raise HTTPBadRequest
 
@@ -87,4 +86,4 @@ def new_qux(request):
     new_qux = app_model.Qux(**qux_kwargs)
     app_model.Session.add(new_qux)
     app_model.try_commit()
-    raise HTTPFound(request.resource_url(new_qux, "view"))
+    raise HTTPFound(request.resource_url(new_qux, route_name="view"))
