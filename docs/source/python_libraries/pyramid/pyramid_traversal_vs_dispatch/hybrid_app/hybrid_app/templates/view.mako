@@ -51,15 +51,7 @@
 
   % if hasattr(request.context, '__getitem__'):
     <h2>Add Child</h2>
-	% if str(type(request.context)).find("FooFactory") > -1:
-      <form action="${request.route_url('new_foo')}" method="POST">
-	% elif str(type(request.context)).find("Foo") > -1:
-      <form action="${request.route_url('new_bar', foo_name=request.context.foo_name)}" method="POST">
-	% elif str(type(request.context)).find("Bar") > -1:
-      <form action="${request.route_url(route_name='new_baz', foo_name=request.context.foo_name, bar_name=request.context.bar_name)}" method="POST">
-	% else:
-      <form action="${request.route_url(route_name='new_qux', foo_name=request.context.foo_name, bar_name=request.context.bar_name, baz_name=request.context.baz_name)}" method="POST">
-	% endif
+      <form action="${request.resource_url(request.context, 'new', route_name='new')}" method="POST">
       <input name="name" placeholder="name"/>
       <input type="submit"/>
     </form>

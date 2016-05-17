@@ -11,8 +11,10 @@ Base = declarative_base()
 def try_commit():
     try:
         Session.commit()
+        return True
     except:
         Session.rollback()
+        return False
 
 
 def bind_engine(engine, create_all=False):

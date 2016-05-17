@@ -426,3 +426,59 @@ Containment & Interfaces
 ----------------
 Hybrid Traversal
 ----------------
+
+Since neither Traversal or URL Dispatch is mutually exclusive (they can both
+coexist in the same application), any mixing of them becomes a "Hybrid"
+application.
+
+Essentially, Hybrid Traversal *is* a Traversal-based application, except:
+
+* the traversal root is chosen based on the defined route instead of from the
+  ``root_factory``
+* the traversal path is chosen based on the route configuration instead of
+  ``PATH_INFO``
+* the set views to be chosen in view lookup are limited to those that match the
+  route_name in their configuration.
+
+In Hybrid Traversal, the traversal is performed during a request after a route
+had maatched, instead of matching a route to a view based on the resource tree.
+
+
+Generating URLs in Hybrid Traversal
++++++++++++++++++++++++++++++++++++
+
+route_name
+~~~~~~~~~~
+
+resource & route_name
+~~~~~~~~~~~~~~~~~~~~~
+
+resource, route_name, & view_name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In Hybrid, traversal & matching view names just like in Traversal. Adding the
+``route_name`` kwarg to ``resource_url`` will make sure that a specific route
+is used, and that only views within that route are matched.
+
+.. code-block:: python
+
+    # configurator
+    config.add_route("route_new", pattern="/route_name_new/*traverse",
+            factory=FooFactory, traverse="*traverse")
+
+    # view callable
+    @view_config(route_name="route_new", name="view_new")
+    def new(context, request):
+        return Response()
+
+    # URL generation
+    request.resource_url(resource, "view_new", route_name="route_new")
+
+
+Suppyling the ``route_name="route_new"`` kwarg to ``resource_url`` matches the
+route defined in the config.
+
+After that, traversal happens until either URL pieces run out, or a leaf resource is reached.
+
+Finally, the first URL path leftover (in this case ``"view_new"``) is considered the ``view_name``, which is matched to a view callable with that view name *and the matching
+route_name*.

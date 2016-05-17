@@ -17,22 +17,26 @@ def main(global_config, **settings):
 
     # using *traverse, urls are completed by traversing the object factory
     config.add_route("view", pattern="/view*traverse",
-            factory=app_model.FooFactory, traverse="*traverse")
+            factory=app_model.FooFactory)
 
     # config.add_route("new", pattern="/new*traverse",
     #         factory=app_model.FooFactory, traverse="*traverse")
 
-    config.add_route("new_foo", pattern="/new", factory=app_model.FooFactory)
-    config.add_route("new_bar", pattern="/{foo_name}/new",
-            factory=app_model.FooFactory, traverse="/{foo_name}")
-    config.add_route("new_baz",
-            pattern="/{foo_name}/{bar_name}/new",
-            factory=app_model.FooFactory,
-            traverse="/{foo_name}/{bar_name}")
-    config.add_route("new_qux",
-            pattern="/{foo_name}/{bar_name}/{baz_name}/new",
-            factory=app_model.FooFactory,
-            traverse="/{foo_name}/{bar_name}/{baz_name}")
+    # 
+    config.add_route("new", pattern="/route/defined/path*traverse",
+            factory=app_model.FooFactory, traverse="*traverse")
+
+    # config.add_route("new_foo", pattern="/new", factory=app_model.FooFactory)
+    # config.add_route("new_bar", pattern="/{foo_name}/new",
+    #         factory=app_model.FooFactory, traverse="/{foo_name}")
+    # config.add_route("new_baz",
+    #         pattern="/{foo_name}/{bar_name}/new",
+    #         factory=app_model.FooFactory,
+    #         traverse="/{foo_name}/{bar_name}")
+    # config.add_route("new_qux",
+    #         pattern="/{foo_name}/{bar_name}/{baz_name}/new",
+    #         factory=app_model.FooFactory,
+    #         traverse="/{foo_name}/{bar_name}/{baz_name}")
 
 
     # # special traversal sections can be provided also
