@@ -24,7 +24,9 @@ def view(request):
 def bad_new(request):
     """ Used to resolve the issue of creating __names__ that match views """
     response = "\"{}\" matches the name of a view & will mess up the resource"\
-            " tree. Still not sure how to 'properly' resolve this."\
+            " tree. To resolve this, one could set up a resource that acts "\
+            "as a URL divider between database queries (e.g. /a/b/c/view "\
+            "=> /foo/a/bar/b/baz/c/view). This example does not do that."\
             .format( request.params.get('name'))
     return Response(response)
 
