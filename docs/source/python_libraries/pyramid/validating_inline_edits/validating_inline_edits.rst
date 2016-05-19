@@ -19,6 +19,12 @@ Working with X-Editable
 
 X-Editable has a lightweight interaction w/ the web app. X-Editable is defined primaryily from an html link ``<a href='#'>`` by using ``data-*`` properties. How these ``data-*`` properties interact with the server is laid out below:
 
+.. code-block:: html
+
+    <a href="#" data-pk="1" data-name="username" data-url="/edit">
+      FooBar
+    </a>
+
 * ``data-pk`` - the primary key of the item being interacted with. POSTs as ``pk``.
 * ``data-name`` or ``id`` - the name of the value this field corrosponds to. If ``data-name`` isn't present, the plain html property ``id`` is used instead. POSTs as ``name``.
 * ``data-url`` - the url in which the POST submission is sent to.
