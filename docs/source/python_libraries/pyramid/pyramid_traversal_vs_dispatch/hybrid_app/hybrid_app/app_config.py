@@ -16,8 +16,29 @@ def main(global_config, **settings):
     config.add_route("index", pattern="/")
 
     # using *traverse, urls are completed by traversing the object factory
-    config.add_route("view", pattern="/view*traverse",
-            factory=app_model.FooFactory)
+    config.add_route(
+            route_name="view_foos",
+            pattern="/view",
+            factory=app_model.FooFactory,
+            )
+    config.add_route(
+            route_name="view_bars",
+            pattern="/{foo_name}/view",
+            factory=app_model.FooFactory,
+            traverse="/{foo_name}",
+            )
+    config.add_route(
+            route_name="view_bazs",
+            pattern="/{foo_name}/{bar_name}/view",
+            factory=app_model.FooFactory,
+            traverse="{foo_name}/{bar_name}",
+            )
+    config.add_route(
+            route_name="view_quxs",
+            pattern="/{foo_name}/{bar_name}/{baz_name}/view",
+            factory=app_model.FooFactory,
+            traverse="{foo_name}/{bar_name}/{baz_name}",
+            )
 
     # config.add_route("new", pattern="/new*traverse",
     #         factory=app_model.FooFactory, traverse="*traverse")

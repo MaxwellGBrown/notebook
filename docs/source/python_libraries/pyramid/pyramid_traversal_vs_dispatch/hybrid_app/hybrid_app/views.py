@@ -1,6 +1,4 @@
-﻿from collections import OrderedDict
-
-from pyramid.response import Response
+﻿from pyramid.response import Response, render_to_response
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 
@@ -12,10 +10,14 @@ def index(request):
     return {"view_root_factory": app_model.FooFactory()}
 
 
-@view_config(route_name="view", renderer="view.mako")
+@view_config(route_name="view")
+@view_config(route_name="view_foo")
+@view_config(route_name="view_bar")
+@view_config(route_name="view_baz")
+@view_config(route_name="view_qux")
 def view(request):
     print("view - request.context: ", str(request.context.__repr__()))
-    return dict()
+    return render_to_response("view.mako", dict(), request=request)
 
 
 @view_config(route_name="new", name="new")
