@@ -65,6 +65,7 @@ Most/all solutions here are cut & paste solutions.
    python_snippets/dictionary_combinations
    python_snippets/ordereddefaultdict
    python_snippets/autovivification
+   python_snippets/ini_to_dict
 
 
 --------------------
