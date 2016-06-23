@@ -96,6 +96,46 @@ Below is the order of operations after a user clicks "Submit":
   Or, for a more complex example: a linear this-then-that process with multiple view callables. Defining the jQuery.ajax's ``success`` funciton separately and nesting a few might be best, so that way a jQuery.ajax ``error`` function can be shared between them.
 
 
+Posting File Uploads Using Ajax
+-------------------------------
+
+If there's a file input, some more hoops need to be jumped through to get the file posted in-tact via ajax.
+
+`The Pyramid Cookbook's file upload example <http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/forms/file_uploads.html>`__ covers how to set up an HTML form to submit using multipart/form-data as the content type, which is important for sending the file.
+
+To match, the ajax call in the javascript needs to be changed to allso allow for multipart/form-data.
+
+.. code-block:: javascript
+  :emphasize-lines: 7,8,15,16
+
+  $(document).on("submit", "#simple_ajax_form", function(event) {
+    event.preventDefault();  // stop plain submit; this is overriding it
+
+    form_url = $(event.target).attr("action");
+    form_method = $(event.target).attr("method");
+
+    // form_data = $(event.target).serialize();
+    form_data = new FormData($(event.target)[0]);
+
+    $.ajax({
+      type: form_method,
+      url: form_url,
+      data: form_data,
+
+      contentType: false,
+      processData: false,
+
+      success: on_success,
+      error: on_error,
+    });
+  });
+
+
+Instead of serializing the form to get form data, a Javascript ``FormData`` object is being constructed from the current form. This captures the file that's selected in the file input.
+
+Notice too that in the actual ajax call settings, ``contentType`` and ``processData`` are both set to ``false``. A false ``contentType`` forces ajax to self-determine the contentType of it's data which is important when uploading files, as they have their own/differing contentTypes. ``processData: false`` keeps ajax from trying to process the contents of the file (and all inputs) for HTTP submission; disabling this keeps the file in tact instead of changing it's contents.
+
+
 Full Example
 ------------
 
