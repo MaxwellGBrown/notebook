@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using fab &amp; fabfile &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../index.html" />
+    <link rel="up" title="fabric" href="../fabric.html" />
+    <link rel="next" title="Using fabric programatically" href="../programming_with_fabric/programming_with_fabric.html" />
+    <link rel="prev" title="fabric" href="../fabric.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-fab-fabfile">
+<span id="example-fabfile"></span><h1>Using fab &amp; fabfile<a class="headerlink" href="#using-fab-fabfile" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal"><span class="pre">fabric</span></code> was meant to be used in conjuction with the <code class="docutils literal"><span class="pre">fab</span></code> command line tool. The <code class="docutils literal"><span class="pre">fab</span></code> command line tool looks to <code class="docutils literal"><span class="pre">fabfile.py</span></code> or a directory with <code class="docutils literal"><span class="pre">__init__.py</span></code> and imports for defined functions and uses them to work on remote hosts.</p>
+<p>Below is an example <code class="docutils literal"><span class="pre">fabfile.py</span></code>:</p>
+<div class="literal-block-wrapper container" id="an-example-fabfile-py">
+<div class="code-block-caption"><span class="caption-text">An example fabfile.py</span><a class="headerlink" href="#an-example-fabfile-py" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fabric.api</span> <span class="kn">import</span> <span class="n">run</span>
+
+<span class="n">env</span><span class="o">.</span><span class="n">hosts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">get_hostname</span><span class="p">():</span>
+    <span class="n">run</span><span class="p">(</span><span class="s2">&quot;hostname&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">make_blank_file</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s2">&quot;blank_file.txt&quot;</span><span class="p">):</span>
+    <span class="n">run</span><span class="p">(</span><span class="s2">&quot;touch {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">do_both</span><span class="p">(</span><span class="n">echo</span><span class="p">):</span>
+    <span class="n">get_hostname</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">echo</span>
+    <span class="n">make_blank_file</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Although this <code class="docutils literal"><span class="pre">fabfile</span></code> is trivial, it can provide a good enough example to explain what fab was made for.</p>
+<p>In the <code class="docutils literal"><span class="pre">env.hosts</span></code> list, we&#8217;ve supplied the hosts which these commands will be run on by default. At the command line, we run</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ fab get_hostname
+</pre></div>
+</div>
+<p>and it makes an SSH connection to each of the env.hosts and does <code class="docutils literal"><span class="pre">run(&quot;hostname&quot;)</span></code>.</p>
+<div class="section" id="fab-args">
+<h2>fab args<a class="headerlink" href="#fab-args" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">make_blank_file()</span></code> provides an opportunity to show how function arguments work with <code class="docutils literal"><span class="pre">fab</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ fab make_blank_file
+$ fab make_blank_file:blank_file.txt
+$ fab make_blank_file:file_name=blank_file.txt
+</pre></div>
+</div>
+<p>Note that all three are functionally equivalent. The 2nd option shows how to provide positional arguments, and the 3rd shows keword arguments.</p>
+</div>
+<div class="section" id="two-functions-one-command">
+<h2>Two functions, one command<a class="headerlink" href="#two-functions-one-command" title="Permalink to this headline">¶</a></h2>
+<p>We can also combine fab commands into the one command line command</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ fab get_hostname make_blank_file
+</pre></div>
+</div>
+<p>This will cycle through <code class="docutils literal"><span class="pre">env.hosts</span></code> and do each command accordingly.</p>
+<p>You can also call your own high-level fab functions in other fab functions!</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ fab do_both
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">$</span> <span class="pre">fab</span> <span class="pre">do_both()</span></code> is functionally equivalent to <code class="docutils literal"><span class="pre">$</span> <span class="pre">fab</span> <span class="pre">get_hostname</span> <span class="pre">make_blank_file</span></code>, but it&#8217;s defined within our fab file.</p>
+</div>
+<div class="section" id="command-line-arguments-for-fab">
+<h2>Command line arguments for fab<a class="headerlink" href="#command-line-arguments-for-fab" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">env</span></code> object in the <code class="docutils literal"><span class="pre">fabfile</span></code> can be overwritten by arguments at the command line. Below is an example of how to override <code class="docutils literal"><span class="pre">env.hosts</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ fab -H localhost do_both
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">-H</span></code> flag means host. Use <code class="docutils literal"><span class="pre">$</span> <span class="pre">fab</span> <span class="pre">--help</span></code> to show the different arguments that can be supplied.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using fab &amp; fabfile</a><ul>
+<li><a class="reference internal" href="#fab-args">fab args</a></li>
+<li><a class="reference internal" href="#two-functions-one-command">Two functions, one command</a></li>
+<li><a class="reference internal" href="#command-line-arguments-for-fab">Command line arguments for fab</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../fabric.html">fabric</a><ul>
+      <li>Previous: <a href="../fabric.html" title="previous chapter">fabric</a></li>
+      <li>Next: <a href="../programming_with_fabric/programming_with_fabric.html" title="next chapter">Using fabric programatically</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/python_libraries/fabric/example_fabfile/example_fabfile.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../_sources/python_libraries/fabric/example_fabfile/example_fabfile.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

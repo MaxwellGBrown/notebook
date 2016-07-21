@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pytest fixtures &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../index.html" />
+    <link rel="up" title="pytest" href="../pytest.html" />
+    <link rel="next" title="Sharing Fixtures Across Modules in the Same Directory" href="../pytest_share_fixtures_in_directory/pytest_share_fixtures_in_dir.html" />
+    <link rel="prev" title="pytest" href="../pytest.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pytest-fixtures">
+<span id="id1"></span><h1>pytest fixtures<a class="headerlink" href="#pytest-fixtures" title="Permalink to this headline">¶</a></h1>
+<p>pytest differs from other unit testing packages in the way it handles fixtures.</p>
+<p>The basic doc on setting up fixtures can be found <a class="reference external" href="http://pytest.org/latest/fixture.html">here</a>.</p>
+<p>Fixtures are used to create (and tear down) a testing environment that are separate from the things being tested. There are several ways to operate with them:</p>
+<ol class="arabic simple">
+<li>Passing fixtures as function arguments of the same name (aka <em>black magic</em>)</li>
+<li>Passing fixtures as strings of the same name to the wrapper <code class="docutils literal"><span class="pre">pytest.mark.usefixtures</span></code> (explicit &gt; implicit)</li>
+<li>Setting up xunit style setup/teardown class methods (most explicit, least flexible)</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+    <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="n">bar</span> <span class="o">=</span> <span class="s2">&quot;Hello World&quot;</span>
+    <span class="k">return</span> <span class="n">Foo</span>
+
+
+<span class="c1"># fixture as function argument of the same name</span>
+<span class="k">def</span> <span class="nf">test_foobar</span><span class="p">(</span><span class="n">foo</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">==</span> <span class="s2">&quot;Hello World&quot;</span>
+
+
+<span class="c1"># fixture as wrapper: assess fixtures using pytest request object</span>
+<span class="nd">@pytest.mark.usefixtures</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_using_fixture_foo</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+   <span class="n">foo</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">_funcargs</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span>
+   <span class="k">assert</span> <span class="n">foo</span><span class="o">.</span><span class="n">bar</span> <span class="o">==</span> <span class="s2">&quot;Hello World&quot;</span>
+
+
+<span class="c1"># xunit setup/teardown fixtures</span>
+<span class="k">class</span> <span class="nc">TestXunitFixture</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">setup_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="s2">&quot;Hello World&quot;</span>
+
+    <span class="k">def</span> <span class="nf">test_xunit_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">bar</span> <span class="o">==</span> <span class="s2">&quot;Hello World&quot;</span>
+</pre></div>
+</div>
+<div class="section" id="fixture-scope">
+<h2>Fixture Scope<a class="headerlink" href="#fixture-scope" title="Permalink to this headline">¶</a></h2>
+<p>Defining the module/class/method scope for fixtures isn&#8217;t exclusive to the
+XUnit style fixtures; this concept is preserved across all pytest fixtures.</p>
+<p>In fact, the xunit setup/teardowns work separately from pytest fixtures so a class can leverage both.</p>
+<p>To declare a scope other than the default function scope, declare the keyword
+argument <code class="docutils literal"><span class="pre">scope</span></code> to the desired scope to these scopes:</p>
+<p>Scope declaration also allows the ability to &#8220;teardown&#8221; fixtures, which is done by calling <code class="docutils literal"><span class="pre">request.addfinalizer()</span></code> on the fixture&#8217;s pytest request.</p>
+<p>Below is a light example of setting this up:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="nd">@pytest.fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;class&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">class_fixture</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="hll">    <span class="n">request</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">foo</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span>
+</span>    <span class="c1"># setUp</span>
+
+    <span class="k">def</span> <span class="nf">teardown_class_fixture</span><span class="p">():</span>
+        <span class="k">pass</span>  <span class="c1"># tearDown</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">add_finalizer</span><span class="p">(</span><span class="n">teardown_class_fixture</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">TestSuite</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">teardown_class</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">setup_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">test_this</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="hll">        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">foo</span> <span class="o">==</span> <span class="s2">&quot;bar&quot;</span>
+</span></pre></div>
+</div>
+<p>The available operatable scopes are:</p>
+<ul class="simple">
+<li>session - shared across all tests &amp; modules in this py.test run</li>
+<li>module - shared in all tests within the same module</li>
+<li>class - shared in all tests within the same class</li>
+<li>function/module - used only by this one test</li>
+</ul>
+<p>In the scope of things, fixtures are always set up before the xunit <code class="docutils literal"><span class="pre">setup</span></code>
+functions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">session_fixture</span>
+  <span class="n">setup_module</span>
+    <span class="n">module_fixture</span>
+      <span class="n">setup_class</span>
+        <span class="n">class_fixture</span>
+          <span class="n">setup_method</span>
+            <span class="n">function</span> <span class="n">fixture</span>
+              <span class="n">TEST</span>
+            <span class="n">teardown_function_fixture</span>
+          <span class="n">teardown_method</span>
+        <span class="n">teardown_class_fixture</span>
+      <span class="n">teardown_class</span>
+    <span class="n">teardown_module_fixture</span>
+  <span class="n">teardown_module</span>
+<span class="n">teardown_session_fixture</span>
+</pre></div>
+</div>
+<p>To run this scope example, use <a class="reference download internal" href="../../../_downloads/fixture_scope.py" download=""><code class="xref download docutils literal"><span class="pre">this</span> <span class="pre">file</span></code></a> and from the
+command line <code class="docutils literal"><span class="pre">$</span> <span class="pre">py.test</span> <span class="pre">-v</span> <span class="pre">-s</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is a representation of how things <em>should</em> work, but the setup_* xunit
+callables are run independently from the test fixtures. It&#8217;s important to
+<em>avoid relying on fixtures in xunit setups/teardowns</em> and they should remain
+separate.</p>
+</div>
+</div>
+<div class="section" id="nesting-fixtures">
+<span id="pytest-nested-fixtures"></span><h2>Nesting Fixtures<a class="headerlink" href="#nesting-fixtures" title="Permalink to this headline">¶</a></h2>
+<p>Fixtures that rely on other fixture&#8217;s setup can use those other fixtures as
+arguments just like test cases take fixtures as arguments.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">fixture1</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">fixture_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="s1">&#39;fixture1&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">fixture_list</span>
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">fixture2</span><span class="p">(</span><span class="n">fixture1</span><span class="p">):</span>
+    <span class="n">new_fixture_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fixture1</span><span class="p">)</span>
+    <span class="n">new_fixture_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;fixture2&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_fixture_list</span>
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">fixture3</span><span class="p">(</span><span class="n">fixture2</span><span class="p">):</span>
+    <span class="n">new_fixture_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fixture2</span><span class="p">)</span>
+    <span class="n">new_fixture_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;fixture3&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_fixture_list</span>
+
+<span class="nd">@pytest.mark.usefixtures</span><span class="p">(</span><span class="s2">&quot;fixture3&quot;</span><span class="p">)</span>  <span class="c1"># only fixture3 is supplied!</span>
+<span class="k">def</span> <span class="nf">test_nested_fixtures</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># also contains fixture2 &amp; fixture1!</span>
+    <span class="n">fixture3_list</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">_funcargs</span><span class="p">[</span><span class="s1">&#39;fixture3&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s2">&quot;fixture1&quot;</span> <span class="ow">in</span> <span class="n">fixture3_list</span>
+    <span class="k">assert</span> <span class="s2">&quot;fixture2&quot;</span> <span class="ow">in</span> <span class="n">fixture3_list</span>
+    <span class="k">assert</span> <span class="s2">&quot;fixture3&quot;</span> <span class="ow">in</span> <span class="n">fixture3_list</span>
+</pre></div>
+</div>
+<p>For a full in-depth example of this, <a class="reference download internal" href="../../../_downloads/nested_fixtures.py" download=""><code class="xref download docutils literal"><span class="pre">check</span> <span class="pre">out</span> <span class="pre">this</span> <span class="pre">file</span></code></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>While it&#8217;s possible to nest fixtures using <code class="docutils literal"><span class="pre">&#64;pytest.mark.usefixtures</span></code>, to
+have it operate correctly <em>all</em> of it&#8217;s nested fixtures must be supplied to
+the test case that relies on that fixture tree, somewhat defeating the
+purpose.</p>
+<p class="last">This is <em>sad</em> for my disdain of py.test&#8217;s black-magic arg-fixture name
+matching.</p>
+</div>
+</div>
+<div class="section" id="parameterized-fixtures-test-cases">
+<h2>Parameterized Fixtures &amp; Test Cases<a class="headerlink" href="#parameterized-fixtures-test-cases" title="Permalink to this headline">¶</a></h2>
+<p>A fixture can be set up to run with different parameters, so that a new test
+will be created for each supplied parameter.</p>
+<p>This can also be set up at the test_case scope, but is sometimes more
+appropriate for the fixture scope.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@pytest.fixture</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;param1&quot;</span><span class="p">,</span> <span class="s2">&quot;param2&quot;</span><span class="p">,</span> <span class="s2">&quot;param3&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">param_fixture</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">param</span>
+
+
+<span class="c1"># param_fixture is results of parametrized fixture</span>
+<span class="k">def</span> <span class="nf">test_param_fixture</span><span class="p">(</span><span class="n">param_fixture</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">param_fixture</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;param&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># param_fixture is the params supplied below. This IS NOT run through fixture</span>
+<span class="nd">@pytest.mark.parameterize</span><span class="p">(</span><span class="s2">&quot;param_fixture&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_override_param_fixture</span><span class="p">(</span><span class="n">param_fixture</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param_fixture</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># parametrization</span>
+<span class="nd">@pytest.mark.parameterize</span><span class="p">(</span><span class="s2">&quot;not_a_fixture&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_parametrized_test_case</span><span class="p">(</span><span class="n">not_a_fixture</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">not_a_fixture</span> <span class="ow">in</span> <span class="s2">&quot;abcd&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pytest fixtures</a><ul>
+<li><a class="reference internal" href="#fixture-scope">Fixture Scope</a></li>
+<li><a class="reference internal" href="#nesting-fixtures">Nesting Fixtures</a></li>
+<li><a class="reference internal" href="#parameterized-fixtures-test-cases">Parameterized Fixtures &amp; Test Cases</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../pytest.html">pytest</a><ul>
+      <li>Previous: <a href="../pytest.html" title="previous chapter">pytest</a></li>
+      <li>Next: <a href="../pytest_share_fixtures_in_directory/pytest_share_fixtures_in_dir.html" title="next chapter">Sharing Fixtures Across Modules in the Same Directory</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/python_libraries/pytest/pytest_fixtures/fixtures.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../_sources/python_libraries/pytest/pytest_fixtures/fixtures.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

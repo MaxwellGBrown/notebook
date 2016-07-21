@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Dynamic One-To-Many Form &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../index.html" />
+    <link rel="up" title="wtforms" href="../wtforms.html" />
+    <link rel="next" title="Unique Dictionary Combinations" href="../../../python_snippets/dictionary_combinations.html" />
+    <link rel="prev" title="Dynamic Select Fields" href="../wtforms_dynamic_select_fields/dynamic_select_fields.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dynamic-one-to-many-form">
+<span id="dynamic-field-list"></span><h1>Dynamic One-To-Many Form<a class="headerlink" href="#dynamic-one-to-many-form" title="Permalink to this headline">¶</a></h1>
+<p>WTForms works very well with static forms, but allowing a user to complete a
+form with a one-to-many relationshipt without navigating multiple pages is a
+use case not well-designed for WTForms.</p>
+<p>Creating a field that allows users to add as many one-to-many objects gives
+them the ability to complete the form to match the model of the relationship
+without navigating through a bunch of pages.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The DynamicFieldList references jQuery functions, and will not operate
+correctly without jQuery imported to the rendered page.</p>
+</div>
+<div class="section" id="dynamicfieldlist">
+<h2>DynamicFieldList<a class="headerlink" href="#dynamicfieldlist" title="Permalink to this headline">¶</a></h2>
+<p>One could achieve the desired effects of a dynamic one-to-many form by
+rendering the subfield to the template and writing custom jQuery on a per-form
+basis to handle deletion/addition of subforms.</p>
+<p>If this is all going to be handled when rendering fields, why not push this off
+to an inheritor of <code class="docutils literal"><span class="pre">wtforms.fields.FieldList</span></code> &amp; some custom <code class="docutils literal"><span class="pre">wtforms.widgets.Widget</span></code> instead?</p>
+<p><code class="docutils literal"><span class="pre">DynamicFieldList</span></code> is less of a custom field and more of a container that
+wraps the subfield&#8217;s widget &amp; it&#8217;s own widget with two custom widgets:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">add_field_widget_wrapper</span></code> - wraps <code class="docutils literal"><span class="pre">DynamicFieldList</span></code>&#8216;s widget to render
+it&#8217;s sub-fields, creates a template of the subfield, and a link to add a new
+subfield to the wrapper</li>
+<li><code class="docutils literal"><span class="pre">deletable_widget_wrapper</span></code> - wraps the subfields of <code class="docutils literal"><span class="pre">DynamicFieldList</span></code> to
+allow the user to delete that subfield.</li>
+</ul>
+<p>The outcome of using <code class="docutils literal"><span class="pre">DynamicFieldList</span></code> looks something like this:</p>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="c">&lt;!-- Without DynamicFieldList --&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;phone_numbers-1-location&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;phone_numbers-1-number&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;phone_numbers-2-location&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;phone_numbers-2-number&quot;</span> <span class="p">/&gt;</span>
+
+<span class="c">&lt;!-- With DynamicFieldList --&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;phone_numbers_wrapper&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;phone_numbers-1-location&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;phone_numbers-1-number&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span><span class="p">&gt;</span>Delete<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;phone_numbers-1-location&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;phone_numbers-1-number&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span><span class="p">&gt;</span>Delete<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">a</span><span class="p">&gt;</span>Add<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>This is rendered by rendering the field, and so far <em>cannot render the
+subfields with __iter__</em>.</p>
+<div class="highlight-mako"><div class="highlight"><pre><span></span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">phone_numbers</span><span class="p">()</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+<div class="section" id="code-for-dynamicfieldlist">
+<h3>Code for DynamicFieldList<a class="headerlink" href="#code-for-dynamicfieldlist" title="Permalink to this headline">¶</a></h3>
+<p>Below is the current code used to create dynamic_field_list</p>
+<div class="literal-block-wrapper container" id="dynamic-field-list-py">
+<div class="code-block-caption"><span class="caption-text">dynamic_field_list.py</span><a class="headerlink" href="#dynamic-field-list-py" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">wtforms</span>
+<span class="kn">from</span> <span class="nn">wtforms.widgets</span> <span class="kn">import</span> <span class="n">html_params</span><span class="p">,</span> <span class="n">HTMLString</span>
+
+
+<span class="k">class</span> <span class="nc">DynamicFieldList</span><span class="p">(</span><span class="n">wtforms</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">FieldList</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unbound_field</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">unbound_field</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">add_field_widget_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_add_entry</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">field</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">deleteable_widget_wrapper</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">deleteable_widget_wrapper</span><span class="p">(</span><span class="n">widget</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wraps widget in div w/ a link to delete div &amp; it&#39;s wrapped widget</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_deleteable_widget</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">html_string</span> <span class="o">=</span> <span class="s2">&quot;&lt;div&gt;&quot;</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="n">widget</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">link_param_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;onclick&quot;</span><span class="p">:</span> <span class="s2">&quot;$(this).parent().remove();&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;javascript:void(0)&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="n">link_params</span> <span class="o">=</span> <span class="n">html_params</span><span class="p">(</span><span class="o">**</span><span class="n">link_param_kwargs</span><span class="p">)</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="s2">&quot;&lt;a {}&gt;Delete&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">link_params</span><span class="p">)</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/div&gt;&quot;</span>
+        <span class="k">return</span> <span class="n">HTMLString</span><span class="p">(</span><span class="n">html_string</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_deleteable_widget</span>
+
+
+<span class="k">def</span> <span class="nf">add_field_widget_wrapper</span><span class="p">(</span><span class="n">widget</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wraps all subfields in a div, adds a link to append subfields to that div.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_add_field_widget</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># spoof field_name in context of it&#39;s form</span>
+        <span class="n">field_name</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">field</span><span class="o">.</span><span class="n">_prefix</span><span class="p">,</span>
+                <span class="n">field</span><span class="o">.</span><span class="n">short_name</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="c1"># render child fields (which should be wrapped w/ delete widgets)</span>
+        <span class="n">wrapper_id</span> <span class="o">=</span> <span class="s2">&quot;{}_wrapper&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field_name</span><span class="p">)</span>
+        <span class="n">html_string</span> <span class="o">=</span> <span class="s2">&quot;&lt;div {}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">html_params</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">wrapper_id</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">subfield</span> <span class="ow">in</span> <span class="n">field</span><span class="p">:</span>
+            <span class="n">html_string</span> <span class="o">+=</span> <span class="n">subfield</span><span class="o">.</span><span class="n">widget</span><span class="p">(</span><span class="n">subfield</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/div&gt;&quot;</span>
+
+        <span class="c1"># render a hidden template of the subfields </span>
+        <span class="n">template_id</span> <span class="o">=</span> <span class="s2">&quot;{}_template&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field_name</span><span class="p">)</span>
+        <span class="n">subform_tmpl_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">template_id</span><span class="p">,</span>
+                <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="s2">&quot;display: none;&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="s2">&quot;&lt;div {}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">html_params</span><span class="p">(</span><span class="o">**</span><span class="n">subform_tmpl_kwargs</span><span class="p">))</span>
+        <span class="n">tmpl_prefix</span> <span class="o">=</span> <span class="s2">&quot;{0}-!{0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field_name</span><span class="p">)</span>
+        <span class="n">tmpl_field</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">unbound_field</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">tmpl_prefix</span><span class="p">,</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">_meta</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="n">tmpl_field</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">formdata</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{})</span>
+        <span class="n">tmpl_field</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">deleteable_widget_wrapper</span><span class="p">(</span><span class="n">tmpl_field</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="n">tmpl_field</span><span class="o">.</span><span class="n">widget</span><span class="p">(</span><span class="n">tmpl_field</span><span class="p">)</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/div&gt;&quot;</span>
+
+        <span class="c1"># create function that duplicates the template field</span>
+        <span class="n">field_name_regex</span> <span class="o">=</span> <span class="n">field_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;\-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;\_&quot;</span><span class="p">)</span>
+        <span class="n">tmpl_regex</span> <span class="o">=</span> <span class="s2">&quot;\!+{0}+\!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field_name_regex</span><span class="p">)</span>
+        <span class="n">onclick</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">$(&quot;#{0}&quot;).append(</span>
+<span class="s2">    $(&quot;#{1}&quot;).clone()  // Duplicate subform from template</span>
+<span class="s2">    .show()  // Display the duplicated subform</span>
+<span class="s2">    .html(  // rewrite HTML of new subform</span>
+<span class="s2">        $(&#39;#{1}&#39;).html()</span>
+<span class="s2">            .replace(new RegExp(&#39;{2}&#39;, &#39;g&#39;),</span>
+<span class="s2">                        (new Date).getTime().toString())</span>
+<span class="s2">         )</span>
+<span class="s2">    .attr(&#39;id&#39;, &#39;&#39;)  // remove #subform_template from new subform</span>
+<span class="s2">);&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">wrapper_id</span><span class="p">,</span> <span class="n">template_id</span><span class="p">,</span> <span class="n">tmpl_regex</span><span class="p">)</span>
+        <span class="n">new_link_params</span> <span class="o">=</span> <span class="n">html_params</span><span class="p">(</span>
+                <span class="n">href</span><span class="o">=</span><span class="s2">&quot;javascript:void(0)&quot;</span><span class="p">,</span>
+                <span class="n">onclick</span><span class="o">=</span><span class="n">onclick</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="s2">&quot;&lt;a {}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">new_link_params</span><span class="p">)</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="s2">&quot;New&quot;</span>
+        <span class="n">html_string</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/a&gt;&quot;</span>
+        <span class="k">return</span> <span class="n">HTMLString</span><span class="p">(</span><span class="n">html_string</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_add_field_widget</span>
+
+
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="full-example">
+<h2>Full Example<a class="headerlink" href="#full-example" title="Permalink to this headline">¶</a></h2>
+<p>Below is the rest of the example that runs <code class="docutils literal"><span class="pre">dynamic_field_list.py</span></code></p>
+<div class="literal-block-wrapper container" id="app-py-webapp-view-callables">
+<div class="code-block-caption"><span class="caption-text">app.py (webapp &amp; view callables)</span><a class="headerlink" href="#app-py-webapp-view-callables" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+<span class="kn">from</span> <span class="nn">pyramid.config</span> <span class="kn">import</span> <span class="n">Configurator</span>
+
+<span class="kn">from</span> <span class="nn">pyramid.view</span> <span class="kn">import</span> <span class="n">view_config</span><span class="p">,</span> <span class="n">view_defaults</span>
+<span class="kn">from</span> <span class="nn">wtforms</span> <span class="kn">import</span> <span class="n">Form</span><span class="p">,</span> <span class="n">StringField</span><span class="p">,</span> <span class="n">FieldList</span><span class="p">,</span> <span class="n">FormField</span>
+
+<span class="kn">from</span> <span class="nn">dynamic_field_list</span> <span class="kn">import</span> <span class="n">DynamicFieldList</span>
+
+
+<span class="k">class</span> <span class="nc">PhoneNumberForm</span><span class="p">(</span><span class="n">form</span><span class="p">):</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="n">SelectField</span><span class="p">(</span><span class="s2">&quot;Location&quot;</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;home&quot;</span><span class="p">,</span> <span class="s2">&quot;Home Phone&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;work&quot;</span><span class="p">,</span> <span class="s2">&quot;Work Phone&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;cell&quot;</span><span class="p">,</span> <span class="s2">&quot;Cell Phone&quot;</span><span class="p">),</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">(</span><span class="s2">&quot;Phone Number&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ContactForm</span><span class="p">(</span><span class="n">form</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">)</span>
+    <span class="n">phone_numbers</span> <span class="o">=</span> <span class="n">DynamicFieldList</span><span class="p">(</span><span class="n">FormField</span><span class="p">(</span><span class="n">PhoneNumberForm</span><span class="p">))</span>
+
+
+<span class="nd">@view_defaults</span><span class="p">(</span><span class="n">renderer</span><span class="o">=</span><span class="s1">&#39;form.mako&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AppController</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+
+    <span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;form&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ParentForm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span> <span class="ow">and</span> <span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Validated!&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">}</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">Configurator</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">include</span><span class="p">(</span><span class="s1">&#39;pyramid_mako&#39;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;form&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">scan</span><span class="p">()</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">make_wsgi_app</span><span class="p">()</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8888</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Starting server at http://localhost:8888&quot;</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper container" id="form-mako-page-form-template">
+<div class="code-block-caption"><span class="caption-text">form.mako (page &amp; form template)</span><a class="headerlink" href="#form-mako-page-form-template" title="Permalink to this code">¶</a></div>
+<div class="highlight-mako"><div class="highlight"><pre><span></span><span class="x">&lt;HTML&gt;</span>
+
+<span class="x">&lt;head&gt;</span>
+<span class="x">  &lt;script src=&quot;https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js&quot;&gt;</span>
+<span class="x">  &lt;/script&gt;</span>
+<span class="x">&lt;/head&gt;</span>
+
+
+<span class="x">&lt;body&gt;</span>
+<span class="x">&lt;form method=&quot;POST&quot; action=&quot;/&quot;&gt;</span>
+
+<span class="x">  &lt;h1&gt;DynamicParentField Demo&lt;/h1&gt;</span>
+<span class="x">  &lt;p&gt;This form houses two DynamicParentFields, &lt;b&gt;primary_tags&lt;/b&gt; and &lt;b&gt;secondary_tags&lt;/b&gt;.&lt;/p&gt;</span>
+<span class="x">  </span>
+<span class="x">  &lt;h2&gt;primary_tags&lt;/h2&gt;</span>
+<span class="x">  </span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">primary_tags</span><span class="p">()</span><span class="cp">}</span><span class="x"></span>
+<span class="x">  &lt;h2&gt;secondary_tags&lt;/h2&gt;</span>
+<span class="x">  </span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">secondary_tags</span><span class="p">()</span><span class="cp">}</span><span class="x"></span>
+<span class="x">  </span>
+<span class="x">  &lt;br/&gt;</span>
+<span class="x">  &lt;input type=&quot;submit&quot; name=&quot;submit&quot; value=&quot;submit&quot; /&gt;</span>
+<span class="x">&lt;/form&gt;</span>
+<span class="x">&lt;/body&gt;</span>
+
+<span class="x">&lt;/HTML&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dynamic One-To-Many Form</a><ul>
+<li><a class="reference internal" href="#dynamicfieldlist">DynamicFieldList</a><ul>
+<li><a class="reference internal" href="#code-for-dynamicfieldlist">Code for DynamicFieldList</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#full-example">Full Example</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../wtforms.html">wtforms</a><ul>
+      <li>Previous: <a href="../wtforms_dynamic_select_fields/dynamic_select_fields.html" title="previous chapter">Dynamic Select Fields</a></li>
+      <li>Next: <a href="../../../python_snippets/dictionary_combinations.html" title="next chapter">Unique Dictionary Combinations</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/python_libraries/wtforms/wtforms_dynamic_field_list/dynamic_field_list.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../_sources/python_libraries/wtforms/wtforms_dynamic_field_list/dynamic_field_list.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

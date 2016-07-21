@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hybrid Traversal &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../../index.html" />
+    <link rel="up" title="Traversal vs. URL Dispatch" href="../pyramid_traversal_vs_dispatch.html" />
+    <link rel="next" title="Simple Ajax Process w/ Pyramid" href="../../pyramid_simple_ajax/pyramid_simple_ajax.html" />
+    <link rel="prev" title="Traversal" href="../traversal_app/traversal.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hybrid-traversal">
+<h1>Hybrid Traversal<a class="headerlink" href="#hybrid-traversal" title="Permalink to this headline">¶</a></h1>
+<p>Since neither Traversal or URL Dispatch is mutually exclusive (they can both coexist in the same application), different aspects of their pathing can be leveraged side-by-side or even work together.</p>
+<p><a class="reference external" href="http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/hybrid.html">Hybrid Traversal</a> is defined as any application that leverages any part of both URL Dispatch &amp; Traversal.</p>
+<p>In practice, Hybrid Traversal <em>is</em> a Traversal-based application, except:</p>
+<ul class="simple">
+<li>the traversal root is chosen based on the defined route instead of from the
+<code class="docutils literal"><span class="pre">root_factory</span></code></li>
+<li>the traversal path is chosen based on the route configuration instead of
+<code class="docutils literal"><span class="pre">PATH_INFO</span></code></li>
+<li>the set views to be chosen in view lookup are limited to those that match the
+route_name in their configuration.</li>
+</ul>
+<p>In Hybrid Traversal, the traversal is performed during a request after a route
+had maatched, instead of matching a route to a view based on the resource tree.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># URL Dispatch</span>
+<span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;foobar&#39;</span><span class="p">,</span> <span class="s1">&#39;{foo}/{bar}&#39;</span><span class="p">)</span>
+
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s1">&#39;foobar&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">url_dispatch</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+
+
+<span class="c1"># Traversal</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set_root_factory</span><span class="p">(</span><span class="n">ResourceTreeRoot</span><span class="p">)</span>
+
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;foobar&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">ResourceClass</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">traversal</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+
+
+<span class="c1"># Hybrid</span>
+<span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span>
+        <span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;foobar&quot;</span><span class="p">,</span>
+        <span class="n">factory</span><span class="o">=</span><span class="n">FooBarFactory</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;/foo/bar*traverse&quot;</span><span class="p">,</span>
+        <span class="n">traverse</span><span class="o">=</span><span class="s2">&quot;*traverse&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;foobar&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">FooResource</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">view_foo</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The most distinguishing difference between Traversal &amp; URL Dispatch is pathing &amp; view matching. The below examples will break into the hybridization of these.</p>
+<div class="section" id="routes-views-in-hybrid-traversal">
+<h2>Routes &amp; Views in Hybrid Traversal<a class="headerlink" href="#routes-views-in-hybrid-traversal" title="Permalink to this headline">¶</a></h2>
+<p>To reiterate, Hybrid Traversal is essentially a Traversal application with defined routes.</p>
+<p>Hybrid Traversal routes act kind of as &#8220;isolated resource trees&#8221; in that you can supply them factories different than the root resource factory. Within that route, Traversal will operate just like it normally would, but only using the views attached to that route, and only traversing throught the resource tree starting with the supplied factory.</p>
+<p>Below will break down how a traversal app uses routes along w/ traversal.</p>
+<p>Each example will break down</p>
+<ol class="arabic simple">
+<li>The route configuration in the <code class="docutils literal"><span class="pre">Configurator</span></code></li>
+<li>The <code class="docutils literal"><span class="pre">&#64;view_config</span></code> for a view that works w/ that route</li>
+<li>Generating a URL for the route</li>
+</ol>
+<div class="section" id="route-name">
+<h3>route_name<a class="headerlink" href="#route-name" title="Permalink to this headline">¶</a></h3>
+<p>Revisiting the backbone of URL Dispatch, just a plain route defined by a route name.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># configurator</span>
+<span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;basic_route&quot;</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;/basic&quot;</span><span class="p">)</span>
+
+<span class="c1"># view_config</span>
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;basic_route&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">basic</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+
+<span class="c1"># URL generation</span>
+<span class="n">request</span><span class="o">.</span><span class="n">route_url</span><span class="p">(</span><span class="s2">&quot;route_name&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="route-name-url-path-matching-by-traversal">
+<h3>route_name &amp; url path matching by Traversal<a class="headerlink" href="#route-name-url-path-matching-by-traversal" title="Permalink to this headline">¶</a></h3>
+<p>In the url pattern for routes, you can supply the <code class="docutils literal"><span class="pre">traverse</span></code> kwarg to handle how far down a URL matching pattern the root factory will traverse.</p>
+<p>The <code class="docutils literal"><span class="pre">traverse</span></code> kwargs allows for tight control on what gets run through the resource tree, and what gets called by <code class="docutils literal"><span class="pre">ResourceTree.__getitem__</span></code> from the PATH_INFO.</p>
+<div class="section" id="a-pure-traversal-hybrid-traversal-route">
+<h4>A &#8220;Pure Traversal&#8221; Hybrid Traversal route<a class="headerlink" href="#a-pure-traversal-hybrid-traversal-route" title="Permalink to this headline">¶</a></h4>
+<p>This is a Hybrid Traversal route, in that it&#8217;s a route. Otherwise, this route is completely defined by the traversal of the request&#8217;s path segments.</p>
+<p>Note that when using a &#8220;pure traversal&#8221; hybrid route, all resources in the route&#8217;s resource tree need to be <cite>location aware &lt;http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/resources.html#location-aware&gt;</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Hybrid Traversal &quot;pure traversal&quot; Configurator route</span>
+<span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span>
+        <span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;traversal_route&quot;</span><span class="p">,</span>
+        <span class="n">factory</span><span class="o">=</span><span class="n">FooBarFactory</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;/traversal/route*traversal&quot;</span><span class="p">,</span>
+        <span class="n">traverse</span><span class="o">=</span><span class="s2">&quot;*traversal&quot;</span><span class="p">,</span>  <span class="c1"># this is actually redundant</span>
+        <span class="p">)</span>
+
+<span class="c1"># view_config for traversal hybrid traversal route. Works just like Traversal!</span>
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;traversal_route&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">ResourceCls</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pure_traversal_view</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+
+<span class="c1"># pure_traversal URL generation. Supply route_name along w/ traversal</span>
+<span class="n">request</span><span class="o">.</span><span class="n">resource_url</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;traversal_route&quot;</span><span class="p">)</span>
+<span class="c1"># &gt;&gt;&gt; http://host/traversal/route/resource/path/view</span>
+</pre></div>
+</div>
+<p>Again, this route operates like a traversal separate resource tree within the route. This includes views that are matched to requests by <code class="docutils literal"><span class="pre">view_name</span></code> matching the leftover PATH_INFO, and views that are matched by context class.</p>
+<p>Leveraging this is how Traversal can best co-exist within a URL Dispatch application (thus becoming Hybrid).</p>
+</div>
+<div class="section" id="matchdict-hybrid-traversal">
+<h4>Matchdict Hybrid Traversal<a class="headerlink" href="#matchdict-hybrid-traversal" title="Permalink to this headline">¶</a></h4>
+<p>Like suggested w/ URL Dispatch &amp; resource allocation, URL-match variables can be defined in the route pattern. If the <code class="docutils literal"><span class="pre">traverse</span></code> kwarg is supplied while adding the route, it will define the values supplied to the resource tree to determine <code class="docutils literal"><span class="pre">request.context</span></code>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Configurator.add_route</span>
+<span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span>
+        <span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;match_dict_traverse&quot;</span><span class="p">,</span>
+        <span class="n">factory</span><span class="o">=</span><span class="n">FooBarFactory</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;/match_dict_traverse/a/{b}/c/{d}&quot;</span><span class="p">,</span>
+        <span class="n">traverse</span><span class="o">=</span><span class="s2">&quot;/a/{b}/c/{d}&quot;</span><span class="p">,</span>
+        <span class="c1"># context = FooBarFactory(request)[&#39;a&#39;][{b}][&#39;c&#39;][{d}]</span>
+<span class="p">)</span>
+
+<span class="c1"># view_config for match_dict_traverse by route name</span>
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;match_dict_traverse&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">match_dict_trav_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+
+<span class="c1"># URL Generation</span>
+<span class="n">request</span><span class="o">.</span><span class="n">route_url</span><span class="p">(</span><span class="s2">&quot;match_dict_traverse&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="c1"># the resource_url can be generated in matchdict traversals, but the resources need</span>
+<span class="c1"># to be location-aware, meaning they need to handle the static portions of the path</span>
+<span class="c1"># (e.g. a &amp; c in this example). This is probably not the best idea :)</span>
+<span class="n">request</span><span class="o">.</span><span class="n">resource_url</span><span class="p">(</span><span class="n">ResourceD</span><span class="p">,</span> <span class="s2">&quot;view_name&quot;</span><span class="p">,</span> <span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;match_dict_traverse&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Doing this you can tightly control the arguments from the route pattern that are supplied to the <code class="docutils literal"><span class="pre">__getitem__</span></code> methods of the context. This is probably the &#8220;middle ground&#8221; between traversal and URL Dispatch, although there&#8217;s arguably little benefit to using routes like this instead of <a class="reference internal" href="../dispatch_app/url_dispatch.html#url-dispatch-resource-location"><span class="std std-ref">URL Dispatch resource location</span></a>.</p>
+</div>
+<div class="section" id="matchdict-traversal">
+<h4>Matchdict &amp; Traversal<a class="headerlink" href="#matchdict-traversal" title="Permalink to this headline">¶</a></h4>
+<p>Sometimes routes desire static path segments between URL Matchdict values and the traversal wildcard.</p>
+<p>Using matchdict to create the earlier portions of the URL before traversing at the end of the path allows for a specific resource tree to exist for that route after</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Configurator.add_route</span>
+<span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span>
+        <span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+        <span class="n">factory</span><span class="o">=</span><span class="n">FooBarFactory</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;/both/{foo}/bar*traverse&#39;</span><span class="p">,</span>
+        <span class="n">traverse</span><span class="o">=</span><span class="s2">&quot;*traverse&quot;</span><span class="p">,</span>
+        <span class="c1"># request.matchdict[&#39;foo&#39;] = {foo}</span>
+        <span class="c1"># FooBarFactory(request)[traverse1][traverse2]...</span>
+<span class="p">)</span>
+
+<span class="c1"># view_config for matchdict &amp; traverse</span>
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">Resource</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">both</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;traversal_view&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">Resource</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">traversal_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+
+<span class="c1"># URL Generation</span>
+<span class="n">request</span><span class="o">.</span><span class="n">resource_url</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">route_name</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">route_kw</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;Hello&#39;</span><span class="p">})</span>
+<span class="n">request</span><span class="o">.</span><span class="n">resource_url</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="s2">&quot;traversal_view&quot;</span><span class="p">,</span> <span class="n">route_nmae</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">Resource</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Hybrid Traversal</a><ul>
+<li><a class="reference internal" href="#routes-views-in-hybrid-traversal">Routes &amp; Views in Hybrid Traversal</a><ul>
+<li><a class="reference internal" href="#route-name">route_name</a></li>
+<li><a class="reference internal" href="#route-name-url-path-matching-by-traversal">route_name &amp; url path matching by Traversal</a><ul>
+<li><a class="reference internal" href="#a-pure-traversal-hybrid-traversal-route">A &#8220;Pure Traversal&#8221; Hybrid Traversal route</a></li>
+<li><a class="reference internal" href="#matchdict-hybrid-traversal">Matchdict Hybrid Traversal</a></li>
+<li><a class="reference internal" href="#matchdict-traversal">Matchdict &amp; Traversal</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../pyramid.html">pyramid</a><ul>
+  <li><a href="../pyramid_traversal_vs_dispatch.html">Traversal vs. URL Dispatch</a><ul>
+      <li>Previous: <a href="../traversal_app/traversal.html" title="previous chapter">Traversal</a></li>
+      <li>Next: <a href="../../pyramid_simple_ajax/pyramid_simple_ajax.html" title="next chapter">Simple Ajax Process w/ Pyramid</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/python_libraries/pyramid/pyramid_traversal_vs_dispatch/hybrid_app/hybrid_traversal.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../../_sources/python_libraries/pyramid/pyramid_traversal_vs_dispatch/hybrid_app/hybrid_traversal.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

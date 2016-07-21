@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pyramid Auth w/ User Model, Hybrid Traversal, &amp; Resource Matching &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../index.html" />
+    <link rel="up" title="Pyramid Authentication &amp; Authorization" href="../pyramid_authentication/pyramid_authentication.html" />
+    <link rel="next" title="Traversal vs. URL Dispatch" href="../pyramid_traversal_vs_dispatch/pyramid_traversal_vs_dispatch.html" />
+    <link rel="prev" title="Pyramid Authentication &amp; Authorization" href="../pyramid_authentication/pyramid_authentication.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyramid-auth-w-user-model-hybrid-traversal-resource-matching">
+<span id="pyramid-full-auth"></span><h1>Pyramid Auth w/ User Model, Hybrid Traversal, &amp; Resource Matching<a class="headerlink" href="#pyramid-auth-w-user-model-hybrid-traversal-resource-matching" title="Permalink to this headline">¶</a></h1>
+<p>Building on top of the Authentication &amp; Authorization basic example, this example goes into depth on how to practically use Auth w/ an accompanying model.</p>
+<p>This example will cover the following:</p>
+<ol class="arabic simple">
+<li>Creating a User/Group model &amp; Database
+1. Storing hashed user passwords
+2. Using sqlalchemys <code class="docutils literal"><span class="pre">&#64;hybrid_property</span></code></li>
+<li>Hybrid Traversal (instead of Route Matching or Traversal)
+1. Factories &amp; resource matching
+2. <code class="docutils literal"><span class="pre">request.context</span></code> &amp; it&#8217;s relationship to factories &amp; <code class="docutils literal"><span class="pre">__acl__</span></code>
+3. <code class="docutils literal"><span class="pre">request.route_url()</span></code> referencing traversals</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Look...</p>
+<p>I don&#8217;t feel like explaining what one does and doesn&#8217;t need to know to understand this example.</p>
+<p>Some of the integral pieces that hold this app together but don&#8217;t quite fit the example topic are going to either be glossed over, or skipped altogether.</p>
+<p class="last">Proceed with caution!</p>
+</div>
+<div class="section" id="setting-up-a-user-model">
+<h2>Setting Up a User Model<a class="headerlink" href="#setting-up-a-user-model" title="Permalink to this headline">¶</a></h2>
+<p>Since the goal of this application is authentication, the model is going to have to store passwords. It would be remiss to store these in plaintext in the database, so they&#8217;re going to have to be hashed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Unicode</span><span class="p">,</span> <span class="n">Integer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.hybird</span> <span class="kn">import</span> <span class="n">hybrid_property</span>
+
+<span class="kn">from</span> <span class="nn">full_auth_app.model</span> <span class="kn">import</span> <span class="n">Base</span>
+
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Unicode</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">_password</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">Unicode</span><span class="p">(</span><span class="mi">255</span><span class="p">))</span>  <span class="c1"># @property = .password</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">password</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_password</span>
+
+    <span class="nd">@password.setter</span>
+    <span class="k">def</span> <span class="nf">set_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="n">salt</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">60</span><span class="p">))</span>
+        <span class="n">salted_pwd</span> <span class="o">=</span> <span class="n">password</span> <span class="o">+</span> <span class="n">salt</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">sha1_hash</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">salted_pwd</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_password</span> <span class="o">=</span> <span class="n">salt</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span> <span class="o">+</span> <span class="n">sha1_hash</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="n">combined_password</span> <span class="o">=</span> <span class="n">password</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">[:</span><span class="mi">40</span><span class="p">]</span>
+        <span class="n">hashed_password</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">combined_password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">))</span>
+        <span class="n">passwords_match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span> <span class="o">==</span> <span class="n">hashed_password</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">passwords_match</span>
+</pre></div>
+</div>
+<p>There&#8217;s a few interesting things going on here.</p>
+<p>First off, <code class="docutils literal"><span class="pre">User._password</span></code> is the actual sqlalchemy <code class="docutils literal"><span class="pre">Column</span></code> object, while <code class="docutils literal"><span class="pre">User.password</span></code> is decorated with <code class="docutils literal"><span class="pre">&#64;hybrid_property</span></code>. Effectively, this allows the wrapping of the password attribute just like with the <code class="docutils literal"><span class="pre">&#64;property</span></code> decorator in normal class definitions.</p>
+<p>After <code class="docutils literal"><span class="pre">User.password</span></code> is defined as a <code class="docutils literal"><span class="pre">&#64;hybrid_property</span></code> it behaves very similarly to a standard property allowing <code class="docutils literal"><span class="pre">User.set_password</span></code> to be wrapped with <code class="docutils literal"><span class="pre">&#64;password.setter</span></code> to create a setter function for the property.</p>
+<p>Lastly, <code class="docutils literal"><span class="pre">User.validate(self,</span> <span class="pre">password)</span></code> is the function that is used to validate a submitted password against a hashed password. It returns <code class="docutils literal"><span class="pre">True</span></code> if the arg <code class="docutils literal"><span class="pre">password</span></code> matches the hashed <code class="docutils literal"><span class="pre">User._password</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><code class="docutils literal"><span class="pre">User.set_password</span></code> assumes that the password supplied is UTF-8 already.</p>
+<p class="last">Since hashing requires a <code class="docutils literal"><span class="pre">bytes</span></code> object, decoding/encoding &amp; exception handling may be necessary.</p>
+</div>
+<p>Now that a sqlalchemy user model is set up, the &#8220;groupfinder&#8221; function (the <em>callback</em> arg supplied to <code class="docutils literal"><span class="pre">AuthTktAuthenticationPolicy</span></code> used to find the effective permissions) and the <code class="docutils literal"><span class="pre">get_user</span></code> fxn (used for <code class="docutils literal"><span class="pre">request.user</span></code>) needs to be changed to reflect the new user model.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    request.user - config.add_request_method(get_user, &#39;user&#39;, reify=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">userid</span> <span class="o">=</span> <span class="n">unauthenticated_userid</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">userid</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">user</span>  <span class="c1"># either a found User ORM object or None</span>
+
+
+<span class="k">def</span> <span class="nf">groupfinder</span><span class="p">(</span><span class="n">userid</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    AuthTktAuthenticationPolicy(..., callback=groupfinder, ...)</span>
+
+<span class="sd">    relies on request.user from ``get_user(request)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;user:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">))</span>
+        <span class="c1"># FIND ADDITIONAL PERMISSIONS HERE</span>
+        <span class="k">return</span> <span class="n">perms</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+</div>
+<p>Since there are currently other permissions modeled (e.g. &#8220;Groups&#8221;) the only permission that can be found is <code class="docutils literal"><span class="pre">&quot;user:&lt;username&gt;&quot;</span></code>.</p>
+</div>
+<div class="section" id="hybrid-traversal-resource-matching">
+<h2>Hybrid Traversal &amp; Resource Matching<a class="headerlink" href="#hybrid-traversal-resource-matching" title="Permalink to this headline">¶</a></h2>
+<p>With a dynamic model set up for permissions, the need for dynamic permission declaration has arised.</p>
+<p>A static set of permissions can&#8217;t be used to reference a dynamic set of permissions.</p>
+<p>To achieve this, an <code class="docutils literal"><span class="pre">__acl__</span></code> property can be assigned to an object, and then a &#8220;Factory&#8221; can retrieve this object as <em>context</em> for a routes request.</p>
+<p>This is achieved using <em>Traversal</em> (pre-defining all routes &amp; views during app configuration), which is the alternative to <em>URL Dispatch</em> (defining the routes by name in app config and scanning to match them to view callables).</p>
+<p>To leverage traversal while using URL Dispatch, views can be defined using <em>Hybrid Traversal</em> which is elaborated in depth in <a class="reference external" href="http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/hybrid.html#combining-traversal-and-url-dispatch">the pyramid &#8220;Hybrid Traversal&#8221; doc</a>.</p>
+<p>To start, let&#8217;s define a &#8220;user_profile&#8221; route in <code class="docutils literal"><span class="pre">app_config</span></code></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyramid.config</span> <span class="kn">import</span> <span class="n">Configurator</span>
+
+<span class="kn">from</span> <span class="nn">full_auth_app.security.factory</span> <span class="kn">import</span> <span class="n">RootFactory</span><span class="p">,</span> <span class="n">UserFactory</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">Configurator</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">set_root_factory</span><span class="p">(</span><span class="n">RootFactory</span><span class="p">)</span>
+    <span class="o">...</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user_profile&quot;</span><span class="p">,</span>
+            <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;/user/{user_id}&quot;</span><span class="p">,</span>
+            <span class="n">factory</span><span class="o">=</span><span class="n">UserFactory</span><span class="p">,</span>
+            <span class="n">traverse</span><span class="o">=</span><span class="s2">&quot;/{user_id}&quot;</span>
+            <span class="p">)</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">make_wsgi_app</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This new &#8220;user_profile&#8221; route, instead of using the default <code class="docutils literal"><span class="pre">RootFactory</span></code> to determine permissions, uses <code class="docutils literal"><span class="pre">UserFactory</span></code>.</p>
+<p>Alongside this, using the <em>traversal</em> policy supplied by <code class="docutils literal"><span class="pre">pattern=&quot;/user/{user_id}&quot;</span></code> and <code class="docutils literal"><span class="pre">traverse=&quot;/{user_id}&quot;</span></code>, a value supplied by the url is passed to <code class="docutils literal"><span class="pre">UserFactory.__getitem__(self,</span> <span class="pre">user_id)</span></code> and, if available, a <code class="docutils literal"><span class="pre">User</span></code> object is returned and set as <code class="docutils literal"><span class="pre">request.context</span></code> (else <code class="docutils literal"><span class="pre">None</span></code>).</p>
+<p>This is effectively <em>Hybrid Traversal</em>: the routes are defined by names in configuration, but they&#8217;re still being matched to view_callables using <code class="docutils literal"><span class="pre">pyramid.view.view_config</span></code> &amp; are discovered w/ <code class="docutils literal"><span class="pre">config.scan()</span></code>.</p>
+<div class="section" id="defining-resource-factories-context">
+<h3>Defining Resource Factories &amp; Context<a class="headerlink" href="#defining-resource-factories-context" title="Permalink to this headline">¶</a></h3>
+<p>Below is the code in <code class="docutils literal"><span class="pre">security/factory.py</span></code> that accomplishes resource matching.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyramid.security</span> <span class="kn">import</span> <span class="n">Allow</span><span class="p">,</span> <span class="n">Everyone</span><span class="p">,</span> <span class="n">Authenticated</span>
+
+<span class="kn">from</span> <span class="nn">full_auth_app.model.auth</span> <span class="kn">import</span> <span class="n">get_user</span>
+
+
+<span class="k">class</span> <span class="nc">UserFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">__acl__</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">Allow</span><span class="p">,</span> <span class="n">Authenticated</span><span class="p">,</span> <span class="s2">&quot;view&quot;</span><span class="p">),</span>
+            <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">user</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+</div>
+<p>Since a <code class="docutils literal"><span class="pre">request.context</span></code> object is being supplied, it can also be used to provide permissions via <code class="docutils literal"><span class="pre">__acl__</span></code>. Lets edit the <code class="docutils literal"><span class="pre">User</span></code> model to add this.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyramid.security</span> <span class="kn">import</span> <span class="n">Allow</span><span class="p">,</span> <span class="n">Deny</span><span class="p">,</span> <span class="n">Everyone</span>
+
+<span class="kn">from</span> <span class="nn">full_auth_app.model</span> <span class="kn">import</span> <span class="n">Base</span>
+
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">__acl__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">Allow</span><span class="p">,</span> <span class="s2">&quot;user:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">),</span> <span class="s2">&quot;edit&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">perms</span>
+
+    <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="traversal-resource-factories-context-explained">
+<h3>Traversal, Resource Factories, &amp; Context Explained<a class="headerlink" href="#traversal-resource-factories-context-explained" title="Permalink to this headline">¶</a></h3>
+<p>In the above example, the <code class="docutils literal"><span class="pre">User.__acl__</span></code> supplies an <code class="docutils literal"><span class="pre">&quot;edit&quot;</span></code> permission to anybody with the principal <code class="docutils literal"><span class="pre">&quot;user:&lt;username&gt;&quot;</span></code>, which effectively means that only a user may edit themselves.</p>
+<p>But one will notice that <code class="docutils literal"><span class="pre">UserFactory</span></code> &amp; <code class="docutils literal"><span class="pre">User</span></code> both provide a set of <code class="docutils literal"><span class="pre">__acl__</span></code>. These interact in a special way:</p>
+<ol class="arabic simple">
+<li><code class="docutils literal"><span class="pre">RootFactory</span></code> is called before ANY other resources are generated. <em>All permissions from</em>  <code class="docutils literal"><span class="pre">RootFactory.__acl__</span></code> are factored in.</li>
+<li>Traversal matches the route&#8217;s resource locator to <code class="docutils literal"><span class="pre">UserFactory</span></code>, which then <em>appends</em> <code class="docutils literal"><span class="pre">UserFactory.__acl__</span></code> to the __acl__&#8217;s collected from <code class="docutils literal"><span class="pre">RootFactory</span></code>.</li>
+<li>Traversal uses <code class="docutils literal"><span class="pre">UserFactory.__getitem__</span></code> to retrieve a <code class="docutils literal"><span class="pre">User</span></code> object. If one is found, <code class="docutils literal"><span class="pre">User.__acl__</span></code> <em>is then added to the collected</em> __acl__ objects.</li>
+</ol>
+<p>Effectively, this works as a long parent-child tree of __acl__ objects. <em>ALL</em> views recieve the permissions determined from <code class="docutils literal"><span class="pre">RootFactory</span></code>. Any views that use the resource <code class="docutils literal"><span class="pre">UserFactory</span></code>, <em>even if</em> <code class="docutils literal"><span class="pre">RootFactory.__getitem__</span></code> <em>is not called</em> is given permissions from <code class="docutils literal"><span class="pre">UserFactory</span></code>. Lastly, if any <code class="docutils literal"><span class="pre">request.context</span></code> object (returned from a resource like <code class="docutils literal"><span class="pre">UserFactory.__getitem__</span></code> during traversal) has an <code class="docutils literal"><span class="pre">.__acl__</span></code> property, those permissions are added.</p>
+<p>In this example, traversal is only matching one resource locator and one context object, but it can become much more complex! Multiple levels of resources and resource locators can be called as they&#8217;re traversed &amp; matched. For a very in-depth view at how traversal works view <a class="reference external" href="http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/traversal.html#the-traversal-algorithm">the official &#8220;Traversal Algorithm&#8221; from pyramid&#8217;s docs</a>.</p>
+</div>
+<div class="section" id="incorperating-context-into-a-view-callable">
+<h3>Incorperating Context into a View Callable<a class="headerlink" href="#incorperating-context-into-a-view-callable" title="Permalink to this headline">¶</a></h3>
+<p>Now that <code class="docutils literal"><span class="pre">request.context</span></code> can provide a <code class="docutils literal"><span class="pre">User</span></code> object specified by user_id in the URL, we can finish implementing the &#8220;user_profile&#8221; view this example set out to create.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyramid.view</span> <span class="kn">import</span> <span class="n">view_config</span>
+
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;user_profile&quot;</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="s2">&quot;user_profile.mako&quot;</span><span class="p">,</span>
+        <span class="n">permission</span><span class="o">=</span><span class="s2">&quot;view&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">user_profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">context</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>It&#8217;s that easy! Offloading the duty of matching the URL to a user &amp; getting the permissions for that User&#8217;s page to <em>resource matching</em> clears up the code for the view callable to be clean &amp; efficient!</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pyramid Auth w/ User Model, Hybrid Traversal, &amp; Resource Matching</a><ul>
+<li><a class="reference internal" href="#setting-up-a-user-model">Setting Up a User Model</a></li>
+<li><a class="reference internal" href="#hybrid-traversal-resource-matching">Hybrid Traversal &amp; Resource Matching</a><ul>
+<li><a class="reference internal" href="#defining-resource-factories-context">Defining Resource Factories &amp; Context</a></li>
+<li><a class="reference internal" href="#traversal-resource-factories-context-explained">Traversal, Resource Factories, &amp; Context Explained</a></li>
+<li><a class="reference internal" href="#incorperating-context-into-a-view-callable">Incorperating Context into a View Callable</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../pyramid.html">pyramid</a><ul>
+  <li><a href="../pyramid_authentication/pyramid_authentication.html">Pyramid Authentication &amp; Authorization</a><ul>
+      <li>Previous: <a href="../pyramid_authentication/pyramid_authentication.html" title="previous chapter">Pyramid Authentication &amp; Authorization</a></li>
+      <li>Next: <a href="../pyramid_traversal_vs_dispatch/pyramid_traversal_vs_dispatch.html" title="next chapter">Traversal vs. URL Dispatch</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/python_libraries/pyramid/pyramid_authentication_with_database/full_pyramid_auth.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../_sources/python_libraries/pyramid/pyramid_authentication_with_database/full_pyramid_auth.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

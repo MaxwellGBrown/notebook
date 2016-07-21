@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyramid &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../index.html" />
+    <link rel="next" title="Pylons-style controllers" href="pyramid_controllers/pyramid_controllers.html" />
+    <link rel="prev" title="pymongo" href="../pymongo/pymongo.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyramid">
+<span id="id1"></span><h1>pyramid<a class="headerlink" href="#pyramid" title="Permalink to this headline">¶</a></h1>
+<p>Pyramid is the <em>microframework</em> child of <code class="docutils literal"><span class="pre">pylons</span></code> and <code class="docutils literal"><span class="pre">repoze.bfg</span></code>. Use it to make your WSGI apps ;).</p>
+<p><strong>Examples</strong></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_templating/pyramid_templating.html">Mako Templates &amp; Pyramid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_controllers/pyramid_controllers.html">Pylons-style controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_unittests/pyramid_unittests.html">Testing with Pyramid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_database_setup/pyramid_database_setup.html">Setting up a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_authentication/pyramid_authentication.html">Pyramid Authentication &amp; Authorization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_traversal_vs_dispatch/pyramid_traversal_vs_dispatch.html">Traversal vs. URL Dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_simple_ajax/pyramid_simple_ajax.html">Simple Ajax Process w/ Pyramid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="form_as_separate_template/form_as_separate_template.html">Separate Template for Rendering Forms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="validating_inline_edits/validating_inline_edits.html">Inline Edits with X-Editable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_bootstrap/pyramid_bootstrap.html">Pyramid &amp; Bootstrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_datatables_ajax/pyramid_datatable.html">AJAX Tables with DataTables</a></li>
+</ul>
+</div>
+<div class="section" id="the-basics">
+<h2>The Basics<a class="headerlink" href="#the-basics" title="Permalink to this headline">¶</a></h2>
+<p>Below demonstrates the setup of a basic web app.</p>
+<div class="section" id="hello-world-in-1-file">
+<h3>Hello World in 1 File<a class="headerlink" href="#hello-world-in-1-file" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">pyramid</span></code> is a <em>microframework</em>, supplies all the tools one may need to create a web app and all of the freedom to organize it how we please.</p>
+<p>In the 1-file WSGI app below, <code class="docutils literal"><span class="pre">main()</span></code> is constructing the WSGI app and <code class="docutils literal"><span class="pre">hello_world(request)</span></code> is the apps single view.</p>
+<div class="literal-block-wrapper container" id="a-simple-single-file-web-app">
+<div class="code-block-caption"><span class="caption-text">a simple single file web app</span><a class="headerlink" href="#a-simple-single-file-web-app" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+<span class="kn">from</span> <span class="nn">pyramid.config</span> <span class="kn">import</span> <span class="n">Configurator</span>
+<span class="kn">from</span> <span class="nn">pyramid.response</span> <span class="kn">import</span> <span class="n">Response</span>
+
+
+<span class="k">def</span> <span class="nf">hello_world</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">Configurator</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">hello_world</span><span class="p">,</span> <span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">make_wsgi_app</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">app</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8888</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Starting server at http://localhost:8888&quot;</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Running <code class="docutils literal"><span class="pre">python</span> <span class="pre">helloworld.py</span></code> will spin up the server and <code class="docutils literal"><span class="pre">main()</span></code> builds and configures the routes of the WSGI app using <code class="docutils literal"><span class="pre">pyramid</span></code>. Upon request, the <code class="docutils literal"><span class="pre">hello_world(request)</span></code> controller/function is triggered and returns <code class="docutils literal"><span class="pre">&quot;Hello&quot;</span></code> as it&#8217;s response.</p>
+</div>
+<div class="section" id="pyramid-eggs">
+<h3>Pyramid &amp; Eggs<a class="headerlink" href="#pyramid-eggs" title="Permalink to this headline">¶</a></h3>
+<p>WSGI apps are made to be portable. <code class="docutils literal"><span class="pre">pyramid</span></code> makes packaging apps up easy, and it requires little effort. The minimum requirements for this are:</p>
+<ul class="simple">
+<li>having a <code class="docutils literal"><span class="pre">setup.py</span></code> that uses <code class="docutils literal"><span class="pre">setuptools.setup()</span></code> to build entry points</li>
+<li>a basic python directory structure with <code class="docutils literal"><span class="pre">__init__.py</span></code> files.</li>
+</ul>
+<div class="literal-block-wrapper container" id="a-basic-pyramid-setup-py">
+<div class="code-block-caption"><span class="caption-text">a basic pyramid setup.py</span><a class="headerlink" href="#a-basic-pyramid-setup-py" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span>
+
+<span class="n">requires</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;pyramid&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">setup</span><span class="p">(</span>
+<span class="hll">        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;basic_app&quot;</span><span class="p">,</span>
+</span>        <span class="n">install_requires</span><span class="o">=</span><span class="n">requires</span><span class="p">,</span>
+        <span class="n">entry_points</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">        [paste.app_factory]</span>
+<span class="hll"><span class="s2">        main = basic_app.setup_app:main</span>
+</span><span class="s2">        &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal"><span class="pre">setup.py</span></code>&#8216;s job is to create the egg file of our application. This egg file can be used to distribute the application and easy installation. The name of the egg will be <code class="docutils literal"><span class="pre">basic_app.egg-info</span></code>.</p>
+<p>The entrypoint for <code class="docutils literal"><span class="pre">paste.app_factory</span></code> points to <code class="docutils literal"><span class="pre">basic_app.setup_app:main</span></code>. It&#8217;s using pythonic module-imports to point to the function <code class="docutils literal"><span class="pre">main()</span></code> in <code class="docutils literal"><span class="pre">basic_app/setup_app.py</span></code>. When the app is accessed using the egg by things like <code class="docutils literal"><span class="pre">pserve</span></code>, which go through the entry point for <code class="docutils literal"><span class="pre">paste.app_factory</span></code>, it will provide arguments to <code class="docutils literal"><span class="pre">basic_app.app.main()</span></code> and accept it&#8217;s output to do stuff with. <code class="docutils literal"><span class="pre">basic_app.main()</span></code> will be defined a little further down the road...</p>
+<p>The <code class="docutils literal"><span class="pre">pyramid</span></code> developers suggest putting <code class="docutils literal"><span class="pre">main()</span></code> in the <code class="docutils literal"><span class="pre">__init__.py</span></code> file for the application. It can be wherever one wants it to be as long as the route matches the call in the <code class="docutils literal"><span class="pre">setup.py</span></code> file.</p>
+<p>Either way, the application needs an <code class="docutils literal"><span class="pre">__init__.py</span></code> for pythonic imports!</p>
+<div class="literal-block-wrapper container" id="a-pyramid-webapp-s-init-py">
+<div class="code-block-caption"><span class="caption-text">a pyramid webapp&#8217;s __init__.py</span><a class="headerlink" href="#a-pyramid-webapp-s-init-py" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">## if setup.py&#39;s entryway was app_example:main, this is what it would be for</span>
+<span class="c1">##</span>
+<span class="c1">## either way, the __init__.py file is needed for pythonic imports!</span>
+<span class="c1"># from pyramid.config import Configurator</span>
+<span class="c1">#</span>
+<span class="c1"># def main():</span>
+<span class="c1">#     config = Configurator()</span>
+<span class="c1">#     config.add_route(&#39;hello&#39;, &#39;/&#39;)</span>
+<span class="c1">#     config.scan(&#39;views&#39;)</span>
+<span class="c1">#     app = config.make_wsgi_app()</span>
+<span class="c1">#     return app&#39;</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, since <code class="docutils literal"><span class="pre">setup.py</span></code> points to <code class="docutils literal"><span class="pre">basic_app.setup_app:main</span></code>, the <code class="docutils literal"><span class="pre">main()</span></code> function, which returns the WSGI app, needs to be defined.</p>
+<div class="literal-block-wrapper container" id="point-the-setup-py-to-app-creation-function">
+<div class="code-block-caption"><span class="caption-text">point the setup.py to app creation function</span><a class="headerlink" href="#point-the-setup-py-to-app-creation-function" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+<span class="kn">from</span> <span class="nn">pyramid.config</span> <span class="kn">import</span> <span class="n">Configurator</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">Configurator</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">scan</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">make_wsgi_app</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Again, the function of this file is to create a WSGI app and serve it!</p>
+<p>With <code class="docutils literal"><span class="pre">main()</span></code>&#8216;s call to <code class="docutils literal"><span class="pre">Configurator.make_wsgi_app()</span></code> an egg can be created by typing <code class="docutils literal"><span class="pre">$</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code>.</p>
+<p>Note that <code class="docutils literal"><span class="pre">config.add_view()</span></code> has been replaced with <code class="docutils literal"><span class="pre">config.scan()</span></code>. This scans the file <code class="docutils literal"><span class="pre">.views</span></code> for any defined views.</p>
+<div class="literal-block-wrapper container" id="simple-views-setup-for-pyramid">
+<div class="code-block-caption"><span class="caption-text">simple views setup for pyramid</span><a class="headerlink" href="#simple-views-setup-for-pyramid" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyramid.response</span> <span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span> <span class="nn">pyramid.view</span> <span class="kn">import</span> <span class="n">view_config</span>
+
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_world</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal"><span class="pre">views.py</span></code> is leveraging the <code class="docutils literal"><span class="pre">pyramid.view.view_config</span></code> wrapper function to define this function as a view for the path <code class="docutils literal"><span class="pre">'hello'</span></code> which is defined as a route in our <code class="docutils literal"><span class="pre">Configurator</span></code> object in <code class="docutils literal"><span class="pre">basic_app/setup_app.py</span></code>.</p>
+<p>Using <code class="docutils literal"><span class="pre">Configurator.scan('views')</span></code>, this file is scanned for any views defined by appropriate <code class="docutils literal"><span class="pre">pyramid.view</span></code> wrappers.</p>
+</div>
+<div class="section" id="configuration-ini-files">
+<h3>Configuration (.ini) files<a class="headerlink" href="#configuration-ini-files" title="Permalink to this headline">¶</a></h3>
+<p>Python&#8217;s WSGI apps are traditionally served using <code class="docutils literal"><span class="pre">.ini</span></code> files (boooo!).</p>
+<p>The <code class="docutils literal"><span class="pre">.ini</span></code> file works in conjunction with pyramid&#8217;s <code class="docutils literal"><span class="pre">pserve</span></code> command, which can be used to serve pyramid WSGI apps.</p>
+<div class="literal-block-wrapper container" id="basic-pyramid-app-ini-file">
+<div class="code-block-caption"><span class="caption-text">basic pyramid app .ini file</span><a class="headerlink" href="#basic-pyramid-app-ini-file" title="Permalink to this code">¶</a></div>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[app:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:basic_app</span>
+<span class="na">pyramid.reload_templates</span> <span class="o">=</span> <span class="s">true</span>
+
+<span class="k">[server:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:pyramid#wsgiref</span>
+<span class="na">host</span> <span class="o">=</span> <span class="s">127.0.0.1 </span>
+<span class="na">port</span> <span class="o">=</span> <span class="s">8888</span>
+
+<span class="k">[loggers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">root</span>
+
+<span class="k">[handlers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">console</span>
+
+<span class="k">[formatters]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">generic</span>
+
+<span class="k">[logger_root]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">console</span>
+
+<span class="k">[handler_console]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">StreamHandler</span>
+<span class="na">args</span> <span class="o">=</span> <span class="s">(sys.stderr,)</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">NOTSET</span>
+<span class="na">formatter</span> <span class="o">=</span> <span class="s">generic</span>
+
+<span class="k">[formatter_generic]</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">%(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal"><span class="pre">[app:main]</span></code> refers to the egg created from <code class="docutils literal"><span class="pre">setup.py</span></code> where <code class="docutils literal"><span class="pre">main</span></code> refers to <code class="docutils literal"><span class="pre">entry_points=&quot;[paste.app_factory]</span> <span class="pre">main</span> <span class="pre">=</span> <span class="pre">basic_app.setup_app:main</span></code>. Remember, that exact line is referring the function in the app that returns the WSGI app.</p>
+<p><code class="docutils literal"><span class="pre">use</span> <span class="pre">=</span> <span class="pre">egg:basic_app</span></code> refers to what the egg is named in the <code class="docutils literal"><span class="pre">setup.py</span></code>. In this continued example it&#8217;s <code class="docutils literal"><span class="pre">name=&quot;basic_app&quot;</span></code>.</p>
+<p>Now that we have a separated the configuration from the app creation, we can start up the server with <code class="docutils literal"><span class="pre">pserve</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pserve development.ini
+</pre></div>
+</div>
+<p>With our .ini and setup.py creating an egg, this application can be run on most web servers!</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyramid</a><ul>
+<li><a class="reference internal" href="#the-basics">The Basics</a><ul>
+<li><a class="reference internal" href="#hello-world-in-1-file">Hello World in 1 File</a></li>
+<li><a class="reference internal" href="#pyramid-eggs">Pyramid &amp; Eggs</a></li>
+<li><a class="reference internal" href="#configuration-ini-files">Configuration (.ini) files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../pymongo/pymongo.html" title="previous chapter">pymongo</a></li>
+      <li>Next: <a href="pyramid_controllers/pyramid_controllers.html" title="next chapter">Pylons-style controllers</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/python_libraries/pyramid/pyramid.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../_sources/python_libraries/pyramid/pyramid.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

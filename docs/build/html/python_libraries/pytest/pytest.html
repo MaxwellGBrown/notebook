@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pytest &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../index.html" />
+    <link rel="next" title="pytest fixtures" href="pytest_fixtures/fixtures.html" />
+    <link rel="prev" title="AJAX DataTables &amp; Pyramid" href="../pyramid/pyramid_datatables_ajax/pyramid_datatable.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pytest">
+<span id="id1"></span><h1>pytest<a class="headerlink" href="#pytest" title="Permalink to this headline">¶</a></h1>
+<p>pytest is a unit-testing framework. Use it to write &amp; run unit tests.</p>
+<p><strong>Examples</strong></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pytest_fixtures/fixtures.html">Fixtures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures/fixtures.html#fixture-scope">Fixture Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures/fixtures.html#nesting-fixtures">Nesting Fixtures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures/fixtures.html#parameterized-fixtures-test-cases">Parameterized Fixtures &amp; Test Cases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pytest_share_fixtures_in_directory/pytest_share_fixtures_in_dir.html">Sharing Session Scoped Fixtures Between Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pytest_share_fixtures_in_directory/pytest_share_fixtures_in_dir.html#housing-shared-fixtures-in-conftest-py">Housing shared fixtures in conftest.py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pytest_database_transaction/pytest_rollback_after_test.html">Rollback sqlalchemy Tranactions per Test Case</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pytest_database_transaction/pytest_rollback_after_test.html#creating-a-rollback-test-fixture">Creating a Rollback Test Fixture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytest_database_transaction/pytest_rollback_after_test.html#rolling-back-scoped-session-test-cases">Rolling Back scoped_session Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytest_database_transaction/pytest_rollback_after_test.html#maintaining-a-test-data-fixture-w-transaction-rollbacks">Maintaining a Test Data Fixture w/ Transaction Rollbacks</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<p>To start w/ pytest, first write a test! Pytest has pretty good test discovery. The best way to ensure tests are discovered is by prefixing them with <code class="docutils literal"><span class="pre">test_</span></code></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_this</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>To run tests, head to the command line and enter:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ py.test
+</pre></div>
+</div>
+<p>It&#8217;s that easy!</p>
+<p>Logically it may make sense to group tests into classes. pytest is totally down with this.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TestThese</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">this</span> <span class="o">=</span> <span class="s2">&quot;Foo&quot;</span>
+    <span class="n">that</span> <span class="o">=</span> <span class="s2">&quot;Bar&quot;</span>
+
+    <span class="k">def</span> <span class="nf">test_foo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">this</span> <span class="o">==</span> <span class="s2">&quot;Foo&quot;</span>
+
+    <span class="k">def</span> <span class="nf">test_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">that</span> <span class="o">==</span> <span class="s2">&quot;Bar&quot;</span>
+</pre></div>
+</div>
+<p>Really there&#8217;s much much more to working with pytest, but this here is the it at it&#8217;s most basic.</p>
+<p>For more in-depth, look into <a class="reference internal" href="pytest_fixtures/fixtures.html#pytest-fixtures"><span class="std std-ref">defining fixtures</span></a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pytest</a><ul>
+<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../pyramid/pyramid_datatables_ajax/pyramid_datatable.html" title="previous chapter">AJAX DataTables &amp; Pyramid</a></li>
+      <li>Next: <a href="pytest_fixtures/fixtures.html" title="next chapter">pytest fixtures</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/python_libraries/pytest/pytest.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../_sources/python_libraries/pytest/pytest.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

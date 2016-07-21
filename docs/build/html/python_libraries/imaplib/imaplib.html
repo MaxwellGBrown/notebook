@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>imaplib &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../index.html" />
+    <link rel="next" title="IMAP4 Wrapper" href="imaplib_mailbox_wrapper/imaplib_mailbox_wrapper.html" />
+    <link rel="prev" title="Using fabric programatically" href="../fabric/programming_with_fabric/programming_with_fabric.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="imaplib">
+<span id="id1"></span><h1>imaplib<a class="headerlink" href="#imaplib" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://docs.python.org/3/library/imaplib.html">imaplib</a> is a package that communicates with an IMAP server, which is used to store email.</p>
+<p>IMAP is specified by <a class="reference external" href="https://tools.ietf.org/html/rfc3501">RFC3501</a> and, although <code class="docutils literal"><span class="pre">imaplib</span></code> hanldes a <em>bit</em> of the communication, a lot of the functions/methods require an understanding of RFC3501 &amp; it&#8217;s commands.</p>
+<p><strong>Examples</strong></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="imaplib_mailbox_wrapper/imaplib_mailbox_wrapper.html">IMAP4 Wrapper</a></li>
+</ul>
+</div>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<p>There&#8217;s a basic scope in which the <code class="docutils literal"><span class="pre">IMAP4</span></code> object lives in...</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Obstantiate object w/ web server  # IMAP4()</span>
+<span class="c1">#     Authenticate as a user        # IMAP4.login()</span>
+<span class="c1">#         Select a mailbox          # IMAP4.select()</span>
+<span class="c1">#             Perform operation     # e.g. IMAP4.fetch()</span>
+<span class="c1">#         Close mailbox             # IMAP4.close()</span>
+<span class="c1">#     Logout                        # IMAP4.logout()</span>
+</pre></div>
+</div>
+<p>After an <code class="docutils literal"><span class="pre">IMAP4</span></code> object enters UNAUTH mode then the object is locked, and no more operations can be done.</p>
+<p>The only scope that can be explicitly forced is the instance scope of <code class="docutils literal"><span class="pre">IMAP4</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">imaplib</span> <span class="kn">import</span> <span class="n">IMAP4</span>
+
+<span class="k">with</span> <span class="n">IMAP4</span><span class="p">(</span><span class="s2">&quot;gmail.com&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mail</span><span class="p">:</span>        <span class="c1"># connect to mail server</span>
+    <span class="n">mail</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;jsmith&quot;</span><span class="p">,</span> <span class="s2">&quot;hunter2&quot;</span><span class="p">)</span>        <span class="c1"># authenticate</span>
+    <span class="n">mail</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;INBOX&quot;</span><span class="p">)</span>                   <span class="c1"># open INBOX</span>
+    <span class="n">mail</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;+FLAGS&quot;</span><span class="p">,</span> <span class="s2">&quot;(</span><span class="se">\\</span><span class="s2">Seen)&quot;</span><span class="p">)</span>  <span class="c1"># operation</span>
+    <span class="n">mail</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>                           <span class="c1"># close INBOX</span>
+    <span class="c1"># mail.logout()  # automatically called after __with__ scope ends</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Any <em>message_set</em> args to IMAP4&#8217;s methods are a string specifying what messages to be acted on.</p>
+<ul class="last simple">
+<li>&#8216;1&#8217; - Operate on message 1</li>
+<li>&#8216;2:4&#8217; - Operate on messages 2-4</li>
+<li>&#8216;1,3&#8217; - Operate on messages 1 &amp; 3</li>
+<li>&#8216;*&#8217; - Operate on the most recent message</li>
+<li>&#8216;1:*&#8217; - Operate on all messages</li>
+<li>&#8216;3:*&#8217; - Operate on all messages after and including 3</li>
+<li>&#8216;1,4,6:*&#8217; - Operate on messages 1, 4, and everything after and including 6</li>
+</ul>
+</div>
+<p>imaplib doesn&#8217;t filter the 3 basic server responses (<code class="docutils literal"><span class="pre">OK</span></code>, <code class="docutils literal"><span class="pre">NO</span></code>, and <code class="docutils literal"><span class="pre">BAD</span></code>).</p>
+<p>This (annoyingly) means that most method calls will return a tuple of <code class="docutils literal"><span class="pre">status,</span> <span class="pre">data</span></code>.</p>
+<p>Since <code class="docutils literal"><span class="pre">BAD</span></code> &amp; <code class="docutils literal"><span class="pre">NO</span></code> mean that the intended operation failed, the <code class="docutils literal"><span class="pre">status</span></code> portion needs to be checked <em>every time a command is run</em> to ensure that a chain of command dies on a failure (extremely frustrating).</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">IMAP4</span><span class="p">(</span><span class="s2">&quot;gmail.com&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mail</span><span class="p">:</span>
+    <span class="n">mail</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;jsmith&quot;</span><span class="p">,</span> <span class="s2">&quot;hunter2&quot;</span><span class="p">)</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;Inbox/Foo&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t select </span><span class="se">\&quot;</span><span class="s2">Inbox/Foo</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="basic-imap-operations-w-imaplib">
+<h2>Basic IMAP Operations w/ imaplib<a class="headerlink" href="#basic-imap-operations-w-imaplib" title="Permalink to this headline">¶</a></h2>
+<p>This section outlines how one might use an already obstantiated IMAP4 object to do some basic IMAP operations.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">imaplib</span> <span class="kn">import</span> <span class="n">IMAP4</span>
+
+<span class="n">mail</span> <span class="o">=</span> <span class="n">IMAP4</span><span class="p">(</span><span class="s2">&quot;gmail.com&quot;</span><span class="p">)</span>
+<span class="n">mail</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;jsmith&quot;</span><span class="p">,</span> <span class="s2">&quot;hunter2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="get-email-contents">
+<h3>Get Email Contents<a class="headerlink" href="#get-email-contents" title="Permalink to this headline">¶</a></h3>
+<p>To get the email contents, IMAP4 can retrieve the RFC822 of an email, which is it&#8217;s complete content.</p>
+<p>The RFC822 can be parsed by <code class="docutils literal"><span class="pre">email.parser.Parser()</span></code> to be read programmatically.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">status</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;Inbox&quot;</span><span class="p">)</span>
+<span class="n">status</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;1:*&quot;</span><span class="p">,</span> <span class="s2">&quot;(RFC822)&quot;</span><span class="p">)</span>
+
+<span class="n">rfc822_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">email_data</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="c1"># [(b&quot;1 (RFC822 {&lt;size&gt;}&quot;, b&quot;&lt;rfc822&gt;&quot;), &quot;)&quot;, ...]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">email_data</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">imap_info</span> <span class="o">=</span> <span class="n">email_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">imap_info</span><span class="p">[:</span><span class="n">imap_info</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot; (RFC822&quot;</span><span class="p">)]</span>
+        <span class="n">rfc822</span> <span class="o">=</span> <span class="n">email_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+
+        <span class="n">rfc822_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rfc822</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="move-emails-to-a-different-mailbox">
+<h3>Move Emails To A Different Mailbox<a class="headerlink" href="#move-emails-to-a-different-mailbox" title="Permalink to this headline">¶</a></h3>
+<p>There&#8217;s no MOVE IMAP command. Because of this, a move needs to be done with a combination of COPY &amp; storing <code class="docutils literal"><span class="pre">\Deleted</span></code> flags.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">status</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;Inbox/Foo&quot;</span><span class="p">)</span>
+
+<span class="n">status</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;2:4&quot;</span><span class="p">,</span> <span class="s2">&quot;Inbox/Bar&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not copy messages 2:4 from Inbox/Foo to Inbox/Bar&quot;</span><span class="p">)</span>
+
+<span class="n">status</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="s2">&quot;2:4&quot;</span><span class="p">,</span> <span class="s2">&quot;+FLAGS&quot;</span><span class="p">,</span> <span class="s2">&quot;(</span><span class="se">\\</span><span class="s2">Deleted)&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not store </span><span class="se">\\</span><span class="s2">Deleted for messages 2:4 in Inbox/Foo&quot;</span><span class="p">)</span>
+
+<span class="n">status</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">expunge</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not expunge Inbox/Bar after adding </span><span class="se">\\</span><span class="s2">Deleted flags&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="import-rfc822-from-file-into-imap">
+<h3>Import RFC822 From File Into IMAP<a class="headerlink" href="#import-rfc822-from-file-into-imap" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes it&#8217;s necessary to load a <code class="docutils literal"><span class="pre">.eml</span></code> file (which is just RFC822) into the mailbox.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;Inbox/Foo&quot;</span>
+<span class="n">flags</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">date</span> <span class="o">=</span> <span class="s2">&quot;Tue, 8 Mar 2016 12:59:36 -0500&quot;</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;~/Documents/email_file.eml&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">email_file</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mailbox</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">email_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+<span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not write email_file.eml to Inbox/Foo&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">imaplib</a><ul>
+<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li><a class="reference internal" href="#basic-imap-operations-w-imaplib">Basic IMAP Operations w/ imaplib</a><ul>
+<li><a class="reference internal" href="#get-email-contents">Get Email Contents</a></li>
+<li><a class="reference internal" href="#move-emails-to-a-different-mailbox">Move Emails To A Different Mailbox</a></li>
+<li><a class="reference internal" href="#import-rfc822-from-file-into-imap">Import RFC822 From File Into IMAP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../fabric/programming_with_fabric/programming_with_fabric.html" title="previous chapter">Using fabric programatically</a></li>
+      <li>Next: <a href="imaplib_mailbox_wrapper/imaplib_mailbox_wrapper.html" title="next chapter">IMAP4 Wrapper</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/python_libraries/imaplib/imaplib.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../_sources/python_libraries/imaplib/imaplib.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

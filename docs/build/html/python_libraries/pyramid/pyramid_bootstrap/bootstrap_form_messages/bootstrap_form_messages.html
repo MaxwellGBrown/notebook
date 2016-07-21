@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Bootstrap Form Validation States &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../../index.html" />
+    <link rel="up" title="mako" href="../../../mako/mako.html" />
+    <link rel="next" title="Separate Template for Rendering Forms" href="../../form_as_separate_template/form_as_separate_template.html" />
+    <link rel="prev" title="Mako Templates &amp; Pyramid" href="../../pyramid_templating/pyramid_templating.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bootstrap-form-validation-states">
+<h1>Bootstrap Form Validation States<a class="headerlink" href="#bootstrap-form-validation-states" title="Permalink to this headline">¶</a></h1>
+<p>Bootstrap provides some really powerful <a class="reference external" href="http://getbootstrap.com/css/#forms-control-validation">validation states</a> which provide strong feedback to users.</p>
+<p>These validation states can be applied with these classes, by adding them to
+the parent element of whatever they&#8217;re refering to:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">.has-success</span></code></li>
+<li><code class="docutils literal"><span class="pre">.has-warning</span></code></li>
+<li><code class="docutils literal"><span class="pre">.has-error</span></code></li>
+</ul>
+<p>Any of the below classes will receive styling based on their parent&#8217;s
+validation state class:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">.control-label</span></code></li>
+<li><code class="docutils literal"><span class="pre">.form-control</span></code></li>
+<li><code class="docutils literal"><span class="pre">.help-block</span></code></li>
+</ul>
+<p>Using <a class="reference internal" href="../../../mako/mako.html#mako"><span class="std std-ref">mako</span></a> templating and <a class="reference internal" href="../../../wtforms/wtforms.html#wtforms"><span class="std std-ref">wtforms</span></a> validation, using these blocks
+to show validation errors is easy and enriching.</p>
+<p>Below is an example of rendering a <code class="docutils literal"><span class="pre">wtforms.Form</span></code> object using Bootstrap Form
+Validation Sates in a <code class="docutils literal"><span class="pre">mako</span></code> template.</p>
+<div class="literal-block-wrapper container" id="make-form-group-mako-function">
+<div class="code-block-caption"><span class="caption-text">make_form_group mako function</span><a class="headerlink" href="#make-form-group-mako-function" title="Permalink to this code">¶</a></div>
+<div class="highlight-mako"><div class="highlight"><pre><span></span><span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;make_form_group(field)&quot;</span><span class="cp">&gt;</span><span class="x"></span>
+<span class="cp">&lt;%</span>
+    <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+        <span class="n">div_class</span> <span class="o">=</span> <span class="s2">&quot;form-group has-error&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">div_class</span> <span class="o">=</span> <span class="s2">&quot;form-group&quot;</span>
+<span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">  &lt;div class=&quot;</span><span class="cp">${</span><span class="n">div_class</span><span class="cp">}</span><span class="x">&quot;&gt;</span>
+<span class="x">    </span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s2">&quot;col-sm-2 control-label&quot;</span><span class="p">)</span><span class="cp">}</span><span class="x"></span>
+<span class="x">	&lt;div class=&quot;col-sm-8&quot;&gt;</span>
+<span class="x">	  </span><span class="cp">${</span><span class="n">field</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s1">&#39;form-control&#39;</span><span class="p">)</span><span class="cp">}</span>
+	  <span class="cp">%</span> <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">field</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span><span class="x"></span>
+<span class="x">	    &lt;span class=&quot;help-block&quot;&gt;</span><span class="cp">${</span><span class="n">error</span><span class="cp">}</span><span class="x">&lt;/span&gt;</span>
+	  <span class="cp">%</span><span class="k"> endfor</span><span class="x"></span>
+<span class="x">	&lt;/div&gt;</span>
+<span class="x">  &lt;/div&gt;</span>
+<span class="cp">&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<p>While it&#8217;s more streamlined to define a mako function like above, some sections
+of the form might need to be rendered differently, in which case you&#8217;d just
+apply the same priciples above but on a per-form-group basis.</p>
+<p>Here&#8217;s the above example being applied in the template.</p>
+<div class="literal-block-wrapper container" id="rendering-make-form-group-in-bootstrap-form">
+<div class="code-block-caption"><span class="caption-text">rendering make_form_group in bootstrap form</span><a class="headerlink" href="#rendering-make-form-group-in-bootstrap-form" title="Permalink to this code">¶</a></div>
+<div class="highlight-mako"><div class="highlight"><pre><span></span><span class="x">&lt;form class=&quot;form-horizontal&quot; action=&quot;</span><span class="cp">${</span><span class="n">request</span><span class="o">.</span><span class="n">route_url</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span><span class="cp">}</span><span class="x">&quot; method=&quot;POST&quot;&gt;</span>
+<span class="x">  </span><span class="cp">${</span><span class="n">make_form_group</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="cp">}</span><span class="x"></span>
+<span class="x">  </span><span class="cp">${</span><span class="n">make_form_group</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">email</span><span class="p">)</span><span class="cp">}</span><span class="x"></span>
+<span class="x">  </span><span class="cp">${</span><span class="n">make_form_group</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">password</span><span class="p">)</span><span class="cp">}</span><span class="x"></span>
+<span class="x">  &lt;div class=&quot;form-group&quot;&gt;</span>
+<span class="x">    &lt;div class=&quot;col-sm-offset-2 col-sm-10&quot;&gt;</span>
+<span class="x">      &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Submit&lt;/button&gt;</span>
+<span class="x">    &lt;/div&gt;</span>
+<span class="x">  &lt;/div&gt;</span>
+<span class="x">&lt;/form&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>Lastly, here&#8217;s the view callable &amp; <code class="docutils literal"><span class="pre">wtform.Form</span></code> used in this example.</p>
+<div class="literal-block-wrapper container" id="view-callable-form-for-validation-states">
+<div class="code-block-caption"><span class="caption-text">view callable &amp; form for validation states</span><a class="headerlink" href="#view-callable-form-for-validation-states" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyramid.view</span> <span class="kn">import</span> <span class="n">view_config</span>
+<span class="kn">from</span> <span class="nn">wtforms</span> <span class="kn">import</span> <span class="n">Form</span><span class="p">,</span> <span class="n">BooleanField</span><span class="p">,</span> <span class="n">StringField</span><span class="p">,</span> <span class="n">PasswordField</span>
+<span class="kn">import</span> <span class="nn">wtforms.validators</span> <span class="kn">as</span> <span class="nn">val</span>
+
+
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="s2">&quot;templates/basic.mako&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">ExampleForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span> <span class="ow">and</span> <span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">():</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;The form was validated!&quot;</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">():</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Please review errors in the form below.&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Complete the form w/ errors to see the example in action!&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">ExampleForm</span><span class="p">(</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s2">&quot;Username&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">val</span><span class="o">.</span><span class="n">Length</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">25</span><span class="p">)])</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s2">&quot;Email&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">val</span><span class="o">.</span><span class="n">Email</span><span class="p">(),</span> <span class="n">val</span><span class="o">.</span><span class="n">InputRequired</span><span class="p">()])</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">PasswordField</span><span class="p">(</span><span class="s2">&quot;Password&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">val</span><span class="o">.</span><span class="n">Length</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">25</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../mako/mako.html">mako</a><ul>
+      <li>Previous: <a href="../../pyramid_templating/pyramid_templating.html" title="previous chapter">Mako Templates &amp; Pyramid</a></li>
+      <li>Next: <a href="../../form_as_separate_template/form_as_separate_template.html" title="next chapter">Separate Template for Rendering Forms</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/python_libraries/pyramid/pyramid_bootstrap/bootstrap_form_messages/bootstrap_form_messages.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../../_sources/python_libraries/pyramid/pyramid_bootstrap/bootstrap_form_messages/bootstrap_form_messages.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

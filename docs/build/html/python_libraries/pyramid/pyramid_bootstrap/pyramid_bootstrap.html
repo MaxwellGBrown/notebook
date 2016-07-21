@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pyramid &amp; Bootstrap &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../index.html" />
+    <link rel="up" title="pyramid" href="../pyramid.html" />
+    <link rel="next" title="Automatic “active” Navigation Tabs" href="pyramid_bootstrap_active_nav/pyramid_bootstrap_active_nav.html" />
+    <link rel="prev" title="Validating Inline Edits" href="../validating_inline_edits/validating_inline_edits.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyramid-bootstrap">
+<h1>Pyramid &amp; Bootstrap<a class="headerlink" href="#pyramid-bootstrap" title="Permalink to this headline">¶</a></h1>
+<p>These examples demonstrate some ways to make pyramid play nicely with <a class="reference external" href="http://getbootstrap.com/">Bootstrap</a>.</p>
+<p><strong>Bootstrap Resources</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="http://getbootstrap.com/css/">Bootstrap CSS</a></li>
+<li><a class="reference external" href="http://getbootstrap.com/components/">Bootstrap Components</a></li>
+</ul>
+<p><strong>Examples</strong></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pyramid_bootstrap_active_nav/pyramid_bootstrap_active_nav.html">Automatic &#8220;active&#8221; Navigation Tabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootstrap_form_messages/bootstrap_form_messages.html">Bootstrap Form Validation States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pyramid_simple_ajax/pyramid_simple_ajax.html">Bootstrap Progress Bar w/ Simple Ajax</a></li>
+</ul>
+</div>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<p>To include bootstrap, just add the following lines to the <code class="docutils literal"><span class="pre">&lt;head&gt;</span></code> of the base template. Bootstrap has this same example on their <a class="reference external" href="http://getbootstrap.com/getting-started/">getting started page</a>.</p>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="c">&lt;!-- jQuery required for Bootstrap --&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- Bootstrap Javascript --&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js&quot;</span> <span class="na">integrity</span><span class="o">=</span><span class="s">&quot;sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS&quot;</span> <span class="na">crossorigin</span><span class="o">=</span><span class="s">&quot;anonymous&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- Bootstrap Styling --&gt;</span>
+<span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css&quot;</span> <span class="na">integrity</span><span class="o">=</span><span class="s">&quot;sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7&quot;</span> <span class="na">crossorigin</span><span class="o">=</span><span class="s">&quot;anonymous&quot;</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pyramid &amp; Bootstrap</a><ul>
+<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../pyramid.html">pyramid</a><ul>
+      <li>Previous: <a href="../validating_inline_edits/validating_inline_edits.html" title="previous chapter">Validating Inline Edits</a></li>
+      <li>Next: <a href="pyramid_bootstrap_active_nav/pyramid_bootstrap_active_nav.html" title="next chapter">Automatic &#8220;active&#8221; Navigation Tabs</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/python_libraries/pyramid/pyramid_bootstrap/pyramid_bootstrap.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../_sources/python_libraries/pyramid/pyramid_bootstrap/pyramid_bootstrap.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

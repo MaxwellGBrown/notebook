@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>AJAX DataTables &amp; Pyramid &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../index.html" />
+    <link rel="up" title="pyramid" href="../pyramid.html" />
+    <link rel="next" title="pytest" href="../../pytest/pytest.html" />
+    <link rel="prev" title="Automatic “active” Navigation Tabs" href="../pyramid_bootstrap/pyramid_bootstrap_active_nav/pyramid_bootstrap_active_nav.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ajax-datatables-pyramid">
+<h1>AJAX DataTables &amp; Pyramid<a class="headerlink" href="#ajax-datatables-pyramid" title="Permalink to this headline">¶</a></h1>
+<p><strong>can be found in</strong> <code class="docutils literal"><span class="pre">exaples/pyramid_datatables_ajax/</span></code></p>
+<p>DataTables is a jQuery package that creates neat, clean, and sexy tables that
+can have their functionality extended with minimal effort (...sometimes).</p>
+<p>One of the advantages that DataTables can provide is the ability to load data
+via AJAX.</p>
+<p>This example outlines the basic initialization of DataTables, and how to work
+with AJAX DataTables data in Pyramid.</p>
+<div class="section" id="loading-datatables-prerequisites">
+<h2>Loading DataTables &amp; prerequisites<a class="headerlink" href="#loading-datatables-prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>To begin, the table must be loaded via CDN.</p>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="c">&lt;!-- jQuery --&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf8&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;//code.jquery.com/jquery-1.10.2.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- DataTables CSS --&gt;</span>
+<span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/css&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;//cdn.datatables.net/1.10.7/css/jquery.dataTables.css&quot;</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- DataTables --&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf8&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;//cdn.datatables.net/1.10.7/js/jquery.dataTables.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="initializing-the-datatable">
+<h2>Initializing the DataTable<a class="headerlink" href="#initializing-the-datatable" title="Permalink to this headline">¶</a></h2>
+<p>Initializing a DataTable is as easy as calling <code class="docutils literal"><span class="pre">.DataTable({})</span></code> on a jQuery table selected object.</p>
+<p>A DataTable can take initializing arguments from the JSON object on
+itialization (e.g. <code class="docutils literal"><span class="pre">.DataTable({processing:</span> <span class="pre">true}))</span></code>) or as part of the
+table&#8217;s <code class="docutils literal"><span class="pre">data-*</span></code> attributes (e.g. <code class="docutils literal"><span class="pre">&lt;table</span> <span class="pre">data-processing=true&gt;</span></code>).</p>
+<p>Here&#8217;s a <a class="reference external" href="http://datatables.net/reference/option/">complete list of DataTables initializaiton arguments</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Any initialization arguments in &#8216;camelCase&#8217; are replaced with dashed strings for data-* values!</p>
+<p class="last">(e.g. serverSide -&gt; data-server-side)</p>
+</div>
+<p>Here is how a simple AJAX DataTable is initialized in the example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+     <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.datatable&quot;</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">);</span>
+     <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.datatable&quot;</span><span class="p">).</span><span class="nx">DataTable</span><span class="p">({</span>
+             <span class="s2">&quot;ajax&quot;</span><span class="o">:</span> <span class="p">{</span>
+                     <span class="nx">url</span><span class="o">:</span> <span class="nx">url</span><span class="p">,</span>
+                     <span class="nx">method</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+                     <span class="nx">data</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+                                     <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span>
+                             <span class="p">},</span>
+                     <span class="p">},</span>
+     <span class="p">});</span>
+     <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#static_datatable&quot;</span><span class="p">).</span><span class="nx">DataTable</span><span class="p">();</span>
+ <span class="p">});</span>
+</pre></div>
+</div>
+<p>In this example, since the <code class="docutils literal"><span class="pre">ajax</span></code> method is a little too complex for a
+<code class="docutils literal"><span class="pre">data-*</span></code> attribute, the url is loaded from the <code class="docutils literal"><span class="pre">data-url</span></code> attribute instead of definining it in the javascript code.</p>
+<p>To complete the DataTable, there just needs to be an HTML Table!</p>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">table</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;datatable&quot;</span> <span class="na">data-url</span><span class="o">=</span><span class="s">&quot;${request.route_url(&#39;table_data&#39;, table_type=&#39;ajax&#39;)}&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">thead</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">th</span> <span class="na">data-data</span><span class="o">=</span><span class="s">&quot;every_other_number&quot;</span><span class="p">&gt;</span>Every Other Number<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">th</span> <span class="na">data-data</span><span class="o">=</span><span class="s">&quot;pos_and_negs.pos&quot;</span><span class="p">&gt;</span>Positive Numbers<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">th</span> <span class="na">data-data</span><span class="o">=</span><span class="s">&quot;pos_and_negs.neg&quot;</span><span class="p">&gt;</span>Negative Numbers<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+                <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">thead</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>Here, the columns of the DataTable are being defined as <code class="docutils literal"><span class="pre">&lt;th&gt;</span></code> tags (instead of within the table initialization). The <code class="docutils literal"><span class="pre">data-data</span></code> attribute is the part of the JSON row object in the server response where that column gets it&#8217;s data from.</p>
+</div>
+<div class="section" id="getting-data-from-the-view-callables">
+<h2>Getting Data from the View Callables<a class="headerlink" href="#getting-data-from-the-view-callables" title="Permalink to this headline">¶</a></h2>
+<p>DataTables can take AJAX data as a JS Array or as JSON objects. JSON objects
+are nice because the data doesn&#8217;t have to be in any order, and can include data
+that isn&#8217;t used in the table.</p>
+<p>Sending ajax data is quite different depending on if the table has
+<code class="docutils literal"><span class="pre">serverSide</span></code> enabled or not. Below will outline both methods.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>JSON output is matched to a column through that &lt;th&gt; tag&#8217;s <code class="docutils literal"><span class="pre">data-data</span></code>
+attribute, or in the column&#8217;s initialization in the JS!</p>
+<p class="last">Any time json.dumps() is run, the object is json-ified, and elements can be
+referenced as <code class="docutils literal"><span class="pre">object.attribute</span></code> and <code class="docutils literal"><span class="pre">object['attribute']</span></code>!</p>
+</div>
+<div class="section" id="single-load-ajax-data">
+<h3>Single Load AJAX Data<a class="headerlink" href="#single-load-ajax-data" title="Permalink to this headline">¶</a></h3>
+<p>Single Load ajax data is the easiest AJAX format to set up. It requires the
+reading of no JSON requests, just returning all of the data that is necessary
+for the table.</p>
+<p>Below is an abbreviated version of the examples &#8220;Single Load&#8221; ajax table.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">pyramid.response</span> <span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span> <span class="nn">pyramid.view</span> <span class="kn">import</span> <span class="n">view_config</span>
+
+<span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s1">&#39;table_data&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">table_data</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="n">row_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;DT_RowAttr&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;data-row_id&#39;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">id</span><span class="p">},</span>
+            <span class="s2">&quot;every_other_number&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;every_other_number&#39;</span><span class="p">],</span>
+            <span class="s2">&quot;pos_and_negs&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;pos_and_negs&#39;</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_data</span><span class="p">)</span>
+    <span class="n">json_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
+    <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The view callable iterates through every item in the &#8220;database&#8221; and sets the
+values of <code class="docutils literal"><span class="pre">row_data</span></code> which will become a JSON object in <code class="docutils literal"><span class="pre">json.dumps()</span></code>.</p>
+<p>After <code class="docutils literal"><span class="pre">$(document).ready()</span></code>, the table will send a request to the server and
+once all of the data is returned and indexed, the table will display the
+values!</p>
+<p>After loading the data, the table is essentially treated as a static HTML
+table. To get new data from the server either the page needs to be refreshed, or the data needs to be reloaded. Any ordering/paging/filtering is done completely in the browser.</p>
+</div>
+<div class="section" id="server-side-ajax-data-processing">
+<h3>Server Side AJAX Data Processing<a class="headerlink" href="#server-side-ajax-data-processing" title="Permalink to this headline">¶</a></h3>
+<p>Server side ajax data processing is far more complex than single-loading the
+data. All of the &#8220;sexy&#8221; features of static DataTables now have to be handled by
+the server. The following is a non-exhaustive list of things that will send a
+request for data to the server:</p>
+<ul class="simple">
+<li>Changing pages</li>
+<li>Changing the page size</li>
+<li>Ordering by a column</li>
+<li>Searching/filtering</li>
+</ul>
+<p>To keep all of these features enabled, the server has to be able to read the
+requests to determine what exactly is being requested and return only the
+specific data pertinent to the request.</p>
+<p>Below is the (non-sorting, non-filtering) reading and response to table data.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s1">&#39;table_data&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">table_data</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">decoder</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecoder</span><span class="p">()</span>
+    <span class="n">data_request</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+
+    <span class="c1"># get the table data based off the request</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">start</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">data_request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">),</span> <span class="n">data_request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">start</span> <span class="o">+</span> <span class="n">length</span><span class="p">]:</span>
+        <span class="n">row_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;DT_RowAttr&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data-row_id&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">id</span><span class="p">},</span>
+            <span class="s2">&quot;every_other_number&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;every_other_number&#39;</span><span class="p">],</span>
+            <span class="s2">&quot;pos_and_negs&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;pos_and_negs&#39;</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_data</span><span class="p">)</span>
+
+    <span class="n">response_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;draw&quot;</span><span class="p">:</span> <span class="n">data_request</span><span class="p">[</span><span class="s1">&#39;draw&#39;</span><span class="p">],</span>
+            <span class="s2">&quot;recordsTotal&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span>
+            <span class="c1"># recordsFiltered is the count of records that match the filter</span>
+            <span class="s2">&quot;recordsFiltered&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">json_response</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">json_response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This example skims over the reading of the JSON request, which contains all of
+the information for filtering, sorting, and paging. A typical JSON DataTables
+request looks like this:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nx">search</span><span class="o">:</span> <span class="p">{</span><span class="nx">u</span><span class="s1">&#39;regex&#39;</span><span class="o">:</span> <span class="nx">False</span><span class="p">,</span> <span class="nx">u</span><span class="s1">&#39;value&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;&#39;</span><span class="p">},</span>
+    <span class="nx">draw</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nx">start</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="nx">length</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="nx">order</span><span class="o">:</span> <span class="p">[{</span><span class="nx">u</span><span class="s1">&#39;column&#39;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">u</span><span class="s1">&#39;dir&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;asc&#39;</span><span class="p">}],</span>
+    <span class="nx">columns</span><span class="o">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="nx">u</span><span class="s1">&#39;orderable&#39;</span><span class="o">:</span> <span class="nx">True</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;search&#39;</span><span class="o">:</span> <span class="p">{</span><span class="nx">u</span><span class="s1">&#39;regex&#39;</span><span class="o">:</span> <span class="nx">False</span><span class="p">,</span> <span class="nx">u</span><span class="s1">&#39;value&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;&#39;</span><span class="p">},</span>
+                <span class="nx">u</span><span class="s1">&#39;data&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;every_other_number&#39;</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;name&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;searchable&#39;</span><span class="o">:</span> <span class="nx">True</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="nx">u</span><span class="s1">&#39;orderable&#39;</span><span class="o">:</span> <span class="nx">True</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;search&#39;</span><span class="o">:</span> <span class="p">{</span><span class="nx">u</span><span class="s1">&#39;regex&#39;</span><span class="o">:</span> <span class="nx">False</span><span class="p">,</span> <span class="nx">u</span><span class="s1">&#39;value&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;&#39;</span><span class="p">},</span>
+                <span class="nx">u</span><span class="s1">&#39;data&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;pos_and_negs.pos&#39;</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;name&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;searchable&#39;</span><span class="o">:</span> <span class="nx">True</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="nx">u</span><span class="s1">&#39;orderable&#39;</span><span class="o">:</span> <span class="nx">True</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;search&#39;</span><span class="o">:</span> <span class="p">{</span><span class="nx">u</span><span class="s1">&#39;regex&#39;</span><span class="o">:</span> <span class="nx">False</span><span class="p">,</span> <span class="nx">u</span><span class="s1">&#39;value&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;&#39;</span><span class="p">},</span>
+                <span class="nx">u</span><span class="s1">&#39;data&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;pos_and_negs.neg&#39;</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;name&#39;</span><span class="o">:</span> <span class="nx">u</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="nx">u</span><span class="s1">&#39;searchable&#39;</span><span class="o">:</span> <span class="nx">True</span>
+            <span class="p">},</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here&#8217;s a breakdown of the request and what each of the values means:</p>
+<dl class="docutils">
+<dt>search</dt>
+<dd><p class="first">The table-wide search function, and associated values.</p>
+<dl class="last docutils">
+<dt>search.regex</dt>
+<dd>Whether or not the search is regex</dd>
+<dt>search.value</dt>
+<dd>The value the client has in the search box</dd>
+</dl>
+</dd>
+<dt>draw</dt>
+<dd>an id pertaining to the data-request. The table is expecting to get a matching draw response value for the request.</dd>
+<dt>start</dt>
+<dd>the row-number of the first item being displayed in the table</dd>
+<dt>length</dt>
+<dd>the number of entries visible in the page. The response is expecting this many entries in the data.</dd>
+<dt>order</dt>
+<dd><p class="first">Which column the data is being ordered by</p>
+<dl class="last docutils">
+<dt>order.column</dt>
+<dd>the index of the column in this requests <code class="docutils literal"><span class="pre">columns</span></code> that the data is being ordered by</dd>
+<dt>order.order</dt>
+<dd>either <code class="docutils literal"><span class="pre">asc</span></code> for ascending or <code class="docutils literal"><span class="pre">desc</span></code> for descending</dd>
+</dl>
+</dd>
+<dt>columns</dt>
+<dd><p class="first">a list of columns that data is being requested for, and information about those columns</p>
+<dl class="last docutils">
+<dt>columns.orderable</dt>
+<dd>bool value that says whether the column can be ordered by or not</dd>
+<dt>columns.search</dt>
+<dd>column-specific search parameters. operates the same as the table-wide</dd>
+<dt>columns.data</dt>
+<dd>the name of the data the column holds (corrosponds to <code class="docutils literal"><span class="pre">data-data</span></code>)</dd>
+<dt>columns.name</dt>
+<dd>the <code class="docutils literal"><span class="pre">data-name</span></code> of the column</dd>
+<dt>columns.searchable</dt>
+<dd>whether or not the column is searchable</dd>
+</dl>
+</dd>
+</dl>
+<p>The above list is not exhaustive to the data request, but certainly
+demonstrates the complexity of a request.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">AJAX DataTables &amp; Pyramid</a><ul>
+<li><a class="reference internal" href="#loading-datatables-prerequisites">Loading DataTables &amp; prerequisites</a></li>
+<li><a class="reference internal" href="#initializing-the-datatable">Initializing the DataTable</a></li>
+<li><a class="reference internal" href="#getting-data-from-the-view-callables">Getting Data from the View Callables</a><ul>
+<li><a class="reference internal" href="#single-load-ajax-data">Single Load AJAX Data</a></li>
+<li><a class="reference internal" href="#server-side-ajax-data-processing">Server Side AJAX Data Processing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../pyramid.html">pyramid</a><ul>
+      <li>Previous: <a href="../pyramid_bootstrap/pyramid_bootstrap_active_nav/pyramid_bootstrap_active_nav.html" title="previous chapter">Automatic &#8220;active&#8221; Navigation Tabs</a></li>
+      <li>Next: <a href="../../pytest/pytest.html" title="next chapter">pytest</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/python_libraries/pyramid/pyramid_datatables_ajax/pyramid_datatable.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../_sources/python_libraries/pyramid/pyramid_datatables_ajax/pyramid_datatable.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

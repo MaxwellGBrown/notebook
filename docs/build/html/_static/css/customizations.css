@@ -1,0 +1,7 @@
+@import url('../alabaster.css');
+
+/* make the captions to code blocks larger */
+div.code-block-caption {
+    font-size: large;
+    font-weight: bold;
+}

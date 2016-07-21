@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Testing with Pyramid &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../../index.html" />
+    <link rel="up" title="unittest" href="../../unittest/unittest.html" />
+    <link rel="next" title="paramiko" href="../../paramiko/paramiko.html" />
+    <link rel="prev" title="TestCase assert methods" href="../../unittest/unittest_assert_methods/unittest_assert_methods.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="testing-with-pyramid">
+<span id="pyramid-unittest"></span><h1>Testing with Pyramid<a class="headerlink" href="#testing-with-pyramid" title="Permalink to this headline">¶</a></h1>
+<p>When testing application code that uses pyramid, there are two main types of tests that can run</p>
+<p><strong>Unit Tests</strong></p>
+<blockquote>
+<div><p>Testing view callables &amp; their returned values <em>before</em> they interact with the renderer.</p>
+<p>The application &amp; all of it&#8217;s pieces <em>are not</em> initialized.</p>
+</div></blockquote>
+<p><strong>Functional Tests</strong></p>
+<blockquote>
+<div><p>Testing the application using HTTP requests and checking the HTTP response.</p>
+<p>This tests the application and the interaction all of it&#8217;s pieces.</p>
+</div></blockquote>
+<div class="section" id="unit-tests">
+<h2>Unit Tests<a class="headerlink" href="#unit-tests" title="Permalink to this headline">¶</a></h2>
+<p>For unit testing, pyramid provides <a class="reference external" href="http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/testing.html">pyramid.testing</a> to create a test <code class="docutils literal"><span class="pre">Configurator</span></code> object and <code class="docutils literal"><span class="pre">DummyRequest</span></code> objects to pass to view callables.</p>
+<p>The dummy <code class="docutils literal"><span class="pre">Configurator</span></code> object returned by <code class="docutils literal"><span class="pre">testing.setUp()</span></code> comes with <strong>none</strong> of the configuration in the application; if any views reference anything in the configuration (e.g. routes) then they need to be added to the dummy config.</p>
+<p><code class="docutils literal"><span class="pre">testing.tearDown()</span></code> deconstructs the dummy <code class="docutils literal"><span class="pre">Configurator</span></code> so that a new one can be created.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">import</span> <span class="nn">pyramid.testing</span>
+
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">test_config</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">pyramid</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">addfinalizer</span><span class="p">(</span><span class="n">pyramid</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">tearDown</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="k">def</span> <span class="nf">test_hello_world</span><span class="p">(</span><span class="n">test_config</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">app_example.views</span> <span class="kn">import</span> <span class="n">hello_world</span>
+
+    <span class="n">request</span> <span class="o">=</span> <span class="n">pyramid</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">DummyRequest</span><span class="p">()</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">hello_world</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Hello World&quot;</span>
+</pre></div>
+</div>
+<div class="section" id="unit-tests-for-views-with-permissions">
+<h3>Unit Tests for Views with Permissions<a class="headerlink" href="#unit-tests-for-views-with-permissions" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">pyramid.testing</span></code> has a way to handle view callables that require some permission information or the view is locked by permission.</p>
+<p>Calling <code class="docutils literal"><span class="pre">config.testing_securitypolicy()</span></code> allows tests to circumvent any pyramid permissions checks.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">test_config</span><span class="o">.</span><span class="n">testing_securitypolicy</span><span class="p">(</span><span class="n">userid</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">permissive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">testing_securitypolicy</span></code> allows the test to set the userid that&#8217;s used for authentication.</p>
+<p>The value passed as <code class="docutils literal"><span class="pre">permissive</span></code> is whether the user passes or fails any security checks.</p>
+</div>
+</div>
+<div class="section" id="functional-tests">
+<span id="pyramid-functional-tests"></span><h2>Functional Tests<a class="headerlink" href="#functional-tests" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/testing.html#creating-functional-tests">Functional testing in pyramid</a> is done by building the whole application, sending HTTP request to it, and checking the HTTP responses returned.</p>
+<p>Pyramid doesn&#8217;t have a module for functional tests, but they suggest using pylons project&#8217;s <a class="reference external" href="http://webtest.pythonpaste.org/en/latest/">WebTest</a> library.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="kn">from</span> <span class="nn">example_app.app_config</span> <span class="kn">import</span> <span class="n">main</span>
+
+
+<span class="nd">@pytest.fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;class&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_app</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">WebTest</span> <span class="kn">import</span> <span class="n">TestApp</span>
+
+    <span class="n">global_config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;__file__&quot;</span><span class="p">:</span> <span class="s2">&quot;test.ini&quot;</span><span class="p">,</span>  <span class="c1"># the file used to initialize</span>
+            <span class="s2">&quot;here&quot;</span><span class="p">:</span> <span class="s2">&quot;example_ve/example_app&quot;</span><span class="p">,</span>  <span class="c1"># the path of the app</span>
+            <span class="p">}</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">ini_to_dict</span><span class="p">(</span><span class="n">ini_filepath</span><span class="p">,</span> <span class="n">sections</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;app:main_app&quot;</span><span class="p">])</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">TestApp</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">test_hello_world</span><span class="p">(</span><span class="n">test_app</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">test_app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s2">&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;</span> <span class="ow">in</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p>The above takes some liberty in passing the necessary items to the app constructor: if an <code class="docutils literal"><span class="pre">.ini</span></code> file is being read for tests see <a class="reference internal" href="../../../python_snippets/ini_to_dict.html#ini-to-dict"><span class="std std-ref">.ini to dict</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If there are any external dependancies from the application (e.g. database, IMAP server, etc.) then they&#8217;ll have to have a separate test environment implemented so that functional tests don&#8217;t interfere with production.</p>
+<p class="last">This can be done by either creating the testing environments or creating fixtures that spoof thier operactions.</p>
+</div>
+<div class="section" id="authentication-in-pyramids-functional-tests">
+<h3>Authentication in Pyramids Functional Tests<a class="headerlink" href="#authentication-in-pyramids-functional-tests" title="Permalink to this headline">¶</a></h3>
+<p>Since functional tests are operating on the whole application, authentication needs to be sincere.</p>
+<p>What this means is that either:</p>
+<ul class="simple">
+<li>A fixture using the <code class="docutils literal"><span class="pre">/login</span></code> feature of the application is set up</li>
+<li>Plant a session cookie in the application using the secret supplied to it in the testing initialization.</li>
+</ul>
+<p>The former is easier while the latter is more pure.</p>
+<p>Either way the cookies need to be cleared between tests so that the user permissions don&#8217;t corrupt the next test.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@pytest.fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">as_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">test_app</span><span class="p">):</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;login&quot;</span><span class="p">:</span> <span class="s2">&quot;test_user&quot;</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="s2">&quot;password1&quot;</span><span class="p">}</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">test_app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;Login Failed&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Login failed. Fixture compromised.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">clear_cookies</span><span class="p">():</span>
+        <span class="n">test_app</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">addfinalizer</span><span class="p">(</span><span class="n">clear_cookies</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s2">&quot;test_user&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">test_hello_world</span><span class="p">(</span><span class="n">test_app</span><span class="p">,</span> <span class="n">as_user</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">test_app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+    <span class="n">expected_greeting</span> <span class="o">=</span> <span class="s2">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">as_user</span>
+    <span class="k">assert</span> <span class="n">expected_greeting</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Testing with Pyramid</a><ul>
+<li><a class="reference internal" href="#unit-tests">Unit Tests</a><ul>
+<li><a class="reference internal" href="#unit-tests-for-views-with-permissions">Unit Tests for Views with Permissions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#functional-tests">Functional Tests</a><ul>
+<li><a class="reference internal" href="#authentication-in-pyramids-functional-tests">Authentication in Pyramids Functional Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../unittest/unittest.html">unittest</a><ul>
+      <li>Previous: <a href="../../unittest/unittest_assert_methods/unittest_assert_methods.html" title="previous chapter">TestCase assert methods</a></li>
+      <li>Next: <a href="../../paramiko/paramiko.html" title="next chapter">paramiko</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/python_libraries/pyramid/pyramid_unittests/pyramid_unittests.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../../_sources/python_libraries/pyramid/pyramid_unittests/pyramid_unittests.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

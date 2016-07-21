@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Metaclasses in Python &mdash; Python Notes 0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/css/customizations.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Python Notes 0 documentation" href="../../index.html" />
+    <link rel="prev" title="Dependancy Injection" href="../dependancy_injection/dependancy_injection.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="metaclasses-in-python">
+<span id="python-metaclasses"></span><h1>Metaclasses in Python<a class="headerlink" href="#metaclasses-in-python" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Metaclasses are deeper magic than 99% of users should ever worry about. If you wonder whether you need them, you don’t (the people who actually need them know with certainty that they need them, and don’t need an explanation about why).</p>
+<p class="last">– Tim Peters (Python God &amp; author of <em>The Zen of Python</em>)</p>
+</div>
+<p>Metaclassing is a seemingly complex idea where <code class="docutils literal"><span class="pre">Class</span></code> objects are programmatically defined.</p>
+<p>I use the words <em>seemingly</em> because, while the very practice of metaclassing dances around the dark edges of python, and the practice is rarely needed, it&#8217;s really straightforward once understood.</p>
+<p>This page has been adapted from the (very helpful) <a class="reference external" href="https://jakevdp.github.io/blog/2012/12/01/a-primer-on-python-metaclasses/">A Primer On Python Metaclasses</a></p>
+<p>Before diving in, the below glossary will establish a few terms:</p>
+<dl class="docutils" id="metaclass">
+<dt><strong>metaclass</strong></dt>
+<dd><em>a class that instantiates classes</em></dd>
+</dl>
+<dl class="docutils" id="metafunction">
+<dt><strong>metafunciton</strong></dt>
+<dd><em>a function that instantiates classes</em></dd>
+</dl>
+<div class="section" id="understanding-type">
+<h2>Understanding Type<a class="headerlink" href="#understanding-type" title="Permalink to this headline">¶</a></h2>
+<p>python&#8217;s peculiar built-in <code class="docutils literal"><span class="pre">type</span></code> can be used to find the type of an object.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;type(1)</span>
+<span class="go">&lt;type &#39;int&#39;&gt;</span>
+</pre></div>
+</div>
+<p>But it&#8217;s dark magic expands much further than type discovery.</p>
+<p>Technically, every defined class in python is of class <code class="docutils literal"><span class="pre">type</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;class Foo(object):</span>
+<span class="gp">... </span>   <span class="k">pass</span>
+<span class="gp">...</span>
+<span class="go">&gt;&gt;&gt;type(Foo)</span>
+<span class="go">&lt;type &#39;type&#39;&gt;</span>
+</pre></div>
+</div>
+<p>This just scratches the surface of the deep pit of complexity that is <code class="docutils literal"><span class="pre">type</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">type</span></code>&#8216;s true form is as <strong>the</strong> <a class="reference internal" href="#metaclass">metaclass</a> in python.</p>
+</div>
+<div class="section" id="actually-defining-classes">
+<h2>Actually Defining Classes<a class="headerlink" href="#actually-defining-classes" title="Permalink to this headline">¶</a></h2>
+<p>So, if <code class="docutils literal"><span class="pre">type</span></code> is actually a metaclass then how does that all work?</p>
+<p>Think about how classes are traditionally defined...</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="k">class</span> <span class="nc">Bar</span><span class="p">(</span><span class="n">Foo</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_i</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span>
+</pre></div>
+</div>
+<p>This is a very basic parent-child relationship between two classes.</p>
+<p>Using <code class="docutils literal"><span class="pre">type</span></code> as a metaclass these classes can be created like so:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Foo</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="n">Bar</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">Foo</span><span class="p">,),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">get_i</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This is the breakdown of how <code class="docutils literal"><span class="pre">type</span></code> is used as a metaclass</p>
+<dl class="docutils">
+<dt><strong>type(name, bases, dct)</strong></dt>
+<dd><dl class="first last docutils">
+<dt><em>name</em></dt>
+<dd>the <code class="docutils literal"><span class="pre">__name__</span></code> of the class to be constructed</dd>
+<dt><em>bases</em></dt>
+<dd>a tuple of the parent classes</dd>
+<dt><em>dct</em></dt>
+<dd>a <code class="docutils literal"><span class="pre">dict</span></code> of attributes &amp; methods of the constructed class</dd>
+</dl>
+</dd>
+</dl>
+</div>
+<div class="section" id="defining-new-metaclasses">
+<h2>Defining New Metaclasses<a class="headerlink" href="#defining-new-metaclasses" title="Permalink to this headline">¶</a></h2>
+<p>Again: <code class="docutils literal"><span class="pre">type</span></code> is <strong>the</strong> metaclass in python.</p>
+<p>So, to define a <em>new</em> metaclass, <code class="docutils literal"><span class="pre">type</span></code> just needs to be inherited!</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Meta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__prepare__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namesapce</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>While <code class="docutils literal"><span class="pre">Meta</span></code> has 4 different methods defined, not all of them are required to be overridden.</p>
+<p>Now the metaclass can be used to define classes!</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Foo</span> <span class="o">=</span> <span class="n">Meta</span><span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="p">(,),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="inheriting-a-metaclass">
+<h2>Inheriting a Metaclass<a class="headerlink" href="#inheriting-a-metaclass" title="Permalink to this headline">¶</a></h2>
+<p>Sure, calling a metaclass like calling <code class="docutils literal"><span class="pre">type</span></code> is the &#8220;standard&#8221; way of using metaclasses.</p>
+<p>But if we&#8217;re going to define our own metaclasses (instead of programmatically) then using <code class="docutils literal"><span class="pre">type</span></code> isn&#8217;t very readable.</p>
+<p>So, we can manipulate the <code class="docutils literal"><span class="pre">class</span></code> builtin to define that a class is constructed from a metaclass!</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Meta</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>It&#8217;s as easy as that!</p>
+<p>just adding the keyword argument <code class="docutils literal"><span class="pre">metaclass</span></code> to the builtin <code class="docutils literal"><span class="pre">class</span></code> definition declares a metaclass constructor for that class.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In python 2.x, the <code class="docutils literal"><span class="pre">class</span></code> builtin does not accept the metaclass keyword argument, or any keyword arguments.</p>
+<p>To define a class as inheriting a metaclass, it&#8217;s must be done with the <code class="docutils literal"><span class="pre">__metaclass__</span></code> class attribute.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>class Foo(object):</dt>
+<dd>__metaclass__ = Meta</dd>
+</dl>
+</div></blockquote>
+<p class="last">Also, the use of <code class="docutils literal"><span class="pre">__prepare__</span></code> and <code class="docutils literal"><span class="pre">**kwargs</span></code> for metaclasses is not implemented in python2.</p>
+</div>
+</div>
+<div class="section" id="the-metaclass-methods">
+<h2>The Metaclass Methods<a class="headerlink" href="#the-metaclass-methods" title="Permalink to this headline">¶</a></h2>
+<p>Okay, so a metaclass can have those 4 methods (<code class="docutils literal"><span class="pre">__prepare__</span></code>, <code class="docutils literal"><span class="pre">__new__</span></code>, <code class="docutils literal"><span class="pre">__init__</span></code> and <code class="docutils literal"><span class="pre">__call__</span></code>). But what do they mean and how do they interact?</p>
+<p>Truthfully, most metaclassing can be done with just <code class="docutils literal"><span class="pre">__new__</span></code>: this is right before the defined class is actually created with python&#8217;s scope, and allows the opportunity to run script to change/setup/override different things in the class definitoin before the class is obstantiated.</p>
+<p>However, there&#8217;s no harm in overriding all 4 of the methods used in metaclassing!</p>
+<p>Lets dive in to the 4 methods and how they interact:</p>
+<div class="section" id="prepare">
+<h3>__prepare__<a class="headerlink" href="#prepare" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Meta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__prepare__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="o">...</span>
+
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Meta</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Any other keyword arguments passed after <code class="docutils literal"><span class="pre">metaclass</span></code> are sent as <code class="docutils literal"><span class="pre">**kwargs</span></code> to <code class="docutils literal"><span class="pre">__prepare__</span></code> which are then passed as the <code class="docutils literal"><span class="pre">**kwargs</span></code> to <code class="docutils literal"><span class="pre">__new__</span></code>.In the above example, <code class="docutils literal"><span class="pre">**kwargs={'foo':'bar'}</span></code>.</p>
+</div>
+<div class="section" id="new">
+<h3>__new__<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Meta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+    <span class="o">...</span>
+
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Meta</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>The class attributes &amp; methods in the new class are passed as a dictionary to the 4th arg to <code class="docutils literal"><span class="pre">__new__</span></code>  (which is titled <code class="docutils literal"><span class="pre">namespace</span></code> in this example). So in the above example <code class="docutils literal"><span class="pre">namespace</span> <span class="pre">=</span> <span class="pre">{'i':</span> <span class="pre">1}</span></code>.</p>
+<p>The <code class="docutils literal"><span class="pre">**kwargs</span></code> passed to <code class="docutils literal"><span class="pre">__new__</span></code> is the dict that is returned by <code class="docutils literal"><span class="pre">__prepare__</span></code>. Note that <code class="docutils literal"><span class="pre">__prepare__</span></code> can actually return whatever it wants, and that it just needs to be handled in <code class="docutils literal"><span class="pre">__new__</span></code>.</p>
+<p>Since <code class="docutils literal"><span class="pre">__new__</span></code> occurs before the class has been instantiated, the 1st argumetn (<code class="docutils literal"><span class="pre">metaclass</span></code>) is essentially an empty class object. Nothing in the namespace dictionary has been attributed to the class (yet).</p>
+</div>
+<div class="section" id="init">
+<h3>__init__<a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Meta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namesapce</span><span class="p">)</span>
+    <span class="o">...</span>
+
+
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Meta</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Operationally, <code class="docutils literal"><span class="pre">__init__</span></code> works much the same as <code class="docutils literal"><span class="pre">__new__</span></code> when metaclassing.</p>
+<p>However, <code class="docutils literal"><span class="pre">__init__</span></code> takes place <em>after</em> class instantiation unlike <code class="docutils literal"><span class="pre">__new__</span></code> which takes place <em>before</em>.</p>
+<p>So, in this example, <code class="docutils literal"><span class="pre">__init__</span></code>&#8216;s 1st argument (<code class="docutils literal"><span class="pre">cls</span></code>) would have this value: <code class="docutils literal"><span class="pre">cls.i</span> <span class="pre">=</span> <span class="pre">1</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">__init__</span></code>&#8216;s kwargs are gathered from <code class="docutils literal"><span class="pre">__prepare__</span></code> and are <code class="docutils literal"><span class="pre">**kwargs</span> <span class="pre">=</span> <span class="pre">{'foo':'bar'}</span></code>.</p>
+<p>Lastly, <code class="docutils literal"><span class="pre">__init__</span></code> uses the namespace dict that <code class="docutils literal"><span class="pre">__new__</span></code> used</p>
+<p>Again, this doesn&#8217;t provide much of an operational difference between the two: it&#8217;s &#8220;most best&#8221; to handle most metaclassing at the <code class="docutils literal"><span class="pre">__new__</span></code> level</p>
+</div>
+<div class="section" id="call">
+<h3>__call__<a class="headerlink" href="#call" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Meta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Lastly, <code class="docutils literal"><span class="pre">__call__</span></code> refers to when the metaclass is called to create an instance of a class. It acts as a middleware which can intercept the <code class="docutils literal"><span class="pre">*args</span></code> and <code class="docutils literal"><span class="pre">**kwargs</span></code> before passing them to the classes <code class="docutils literal"><span class="pre">__init__</span></code>.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>Again, metaclassing isn&#8217;t needed in 99% of programming cases, and a lot of instances where it can be used are still not the cleanest solutions. However, knowing how to use metaclasses is important so that when it <em>is</em> needed it can be used.</p>
+<p>If anything should be remembered from this rant, let it be known that...</p>
+<p><strong>type</strong> is <em>waaaayyy</em> more than a function to determine a class&#8217;s constructor.</p>
+<p><code class="docutils literal"><span class="pre">type</span></code> is <strong>the</strong> metaclass!</p>
+</div>
+<div class="section" id="summary">
+<span id="metaclass-summary"></span><h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Here&#8217;s the quick and dirty!</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Meta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the metaclass!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__prepare__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># cls has all of the attributes/methods from __new__&#39;s namespace</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">namesapce</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Meta</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">):</span>  <span class="c1"># **kwargs = {&#39;foo&#39;: &#39;bar&#39;}</span>
+    <span class="n">hello</span> <span class="o">=</span> <span class="s2">&quot;World&quot;</span>  <span class="c1"># namespace = {&#39;hello&#39;: &quot;World&quot;}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s1">&#39;B&#39;</span><span class="p">):</span>  <span class="c1"># __call__ *args &amp; **kwargs</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Metaclasses in Python</a><ul>
+<li><a class="reference internal" href="#understanding-type">Understanding Type</a></li>
+<li><a class="reference internal" href="#actually-defining-classes">Actually Defining Classes</a></li>
+<li><a class="reference internal" href="#defining-new-metaclasses">Defining New Metaclasses</a></li>
+<li><a class="reference internal" href="#inheriting-a-metaclass">Inheriting a Metaclass</a></li>
+<li><a class="reference internal" href="#the-metaclass-methods">The Metaclass Methods</a><ul>
+<li><a class="reference internal" href="#prepare">__prepare__</a></li>
+<li><a class="reference internal" href="#new">__new__</a></li>
+<li><a class="reference internal" href="#init">__init__</a></li>
+<li><a class="reference internal" href="#call">__call__</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../dependancy_injection/dependancy_injection.html" title="previous chapter">Dependancy Injection</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/programming_patterns/metaclasses/metaclasses.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Maxwell G. Brown.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="../../_sources/programming_patterns/metaclasses/metaclasses.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
