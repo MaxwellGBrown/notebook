@@ -1,5 +1,5 @@
 *.pyc
-#docs/build/*
+docs/build/*
 env/*
 *.swp
 *.egg-info
