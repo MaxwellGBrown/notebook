@@ -1,52 +1,40 @@
 ﻿from pyramid.view import view_config, forbidden_view_config
-from pyramid.httpexceptions import HTTPFound
-from pyramid.security import remember, forget, Allow, Everyone
-from wtforms import Form, StringField, PasswordField, validators
 
-from auth_app.model.auth import USERS
+from auth_app.model.auth import UserMgr
 
 
-@view_config(route_name='login', renderer="auth_app:templates/login.mako")
-def login(request):
-    login_form = LoginForm(request.POST)
-    if request.method == "POST" and login_form.validate():
-        for user in USERS:
-            if user.username == login_form.login.data:
-                if user.password == login_form.password.data:
-                    print("Successful auth as ", login_form.login.data)
-                    headers = remember(request, user.userid)
-                    raise HTTPFound(request.route_url('index'), headers=headers)
-    return {"login_form": login_form}
-
-
-@view_config(route_name="logout")
-def logout(request):
-    headers = forget(request)
-    return HTTPFound(request.route_url('login'), headers=headers)
-
-
-@forbidden_view_config(renderer="auth_app:templates/forbidden.mako")
+@forbidden_view_config(renderer="forbidden.mako")
 def forbidden(request):
     return {}
 
 
-@view_config(route_name="index", renderer="auth_app:templates/index.mako",
-        permission="view")
+@view_config(route_name="index", renderer="index.mako")
 def index(request):
-    return {}
+    user_form = UserForm(request.POST)
+    if request.method == "POST" and user_form.validate():
+        new_user = UserMgr.new(username=user_form.username.data)
+        print("new_user: ", new_user)
+        new_user.password = user_form.password.data
+        UserMgr.commit()
+    return {"user_form": user_form}
 
 
-@view_config(route_name="admin", renderer="auth_app:templates/admin.mako",
-        permission='admin')
-def admin(request):
-    return {}
+@view_config(route_name="home", renderer="home.mako", permission="view")
+def home(request):
+    all_users = UserMgr.get().all()
+    return {"all_users": all_users}
 
 
-@view_config(route_name="public", renderer="auth_app:templates/public.mako")
-def public(request):
-    return {}
+import wtforms
 
 
-class LoginForm(Form):
-    login = StringField("Username")
-    password = PasswordField("Password")
+class UserForm(wtforms.Form):
+    username = wtforms.StringField("Username",
+            validators=[wtforms.validators.DataRequired()])
+    password = wtforms.PasswordField("Password",
+            validators=[wtforms.validators.DataRequired()])
+
+    def validate_username(form, field):
+        if UserMgr.one(username=field.data):
+            msg = "Username {} is taken".format(field.data)
+            raise wtforms.ValidationError(msg)

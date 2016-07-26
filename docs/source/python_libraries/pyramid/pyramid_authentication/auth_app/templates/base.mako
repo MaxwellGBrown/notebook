@@ -25,10 +25,12 @@ Pyramid Auth
 <%def name="navigation()">
 <ul id="navigation" class="nav nav-tabs nav-justified">
   <li><a href="${request.route_url('index')}">Index</a></li>
-  <li><a href="${request.route_url('admin')}">Admin</a></li>
-  <li><a href="${request.route_url('public')}">Public</a></li>
-  <li><a href="${request.route_url('login')}">Login</a></li>
+  <li><a href="${request.route_url('home')}">Home</a></li>
+  % if request.user is not None:
   <li><a href="${request.route_url('logout')}">Logout</a></li>
+  % else:
+  <li><a href="${request.route_url('login')}">Log In</a></li>
+  % endif
 </ul>
 </%def>
 
