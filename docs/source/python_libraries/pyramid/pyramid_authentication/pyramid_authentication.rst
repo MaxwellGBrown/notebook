@@ -284,7 +284,7 @@ Remembering authenticated users is done by managing their cookies using ``rememb
         return HTTPFound(request.route_url('login'), headers=headers)
 
 
-For more encompassing views & better validation, check out the full code for auth_app's `views/auth.py`.
+For more encompassing views & better validation, check out the full code for auth_app's :download:`views/auth.py <auth_app/views/auth.py>`.
 
 
 Assign Permissions To Views
