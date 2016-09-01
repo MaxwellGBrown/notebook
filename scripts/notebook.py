@@ -45,7 +45,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Manipulte Notebook")
     parser.add_argument('--refresh', '-r',
             action="store_true", dest="refresh", default=False,
-            help="Run sphinx-build but do not launch xdg-open again.")
+            help="Run sphinx-build but do not launch browser again.")
     parser.add_argument('--rebuild', '-d',
             action='store_true', dest="rebuild", default=False,
             help="Remove previous build before running sphinx-build.")
