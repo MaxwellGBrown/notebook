@@ -5,6 +5,11 @@ setup_kwargs = {
         "name": "notebook",
         "version": "0.1",
         "url": "https://github.com/MaxwellGBrown",
+        "entry_points": {
+            "console_scripts": [
+                "notebook = scripts.notebook:main",
+                ]
+            },
         }
 
 
