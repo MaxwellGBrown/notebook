@@ -5,7 +5,6 @@
 **1 Sept 2016**
 
 `Project Euler problem <https://projecteuler.net/problem=8>`__
-
 The four adjacent digits in the 1000-digit number that have the greatest
 product are 9 × 9 × 8 × 9 = 5832.
 
@@ -68,15 +67,20 @@ Solution
 
 
     def largest_adjacent_product(n=4):
-        start, end = 0, n
+        substrings = x.split("0")
         largest_product = 0
-        while end <= len(x):  # len(x) == 1000
-            substring = x[start:end]
-            values = [int(c) for c in substring]
-            product = reduce(lambda x, y: x * y, values)
-            if product > largest_product:
-                largest_product = product
-            start, end = start + 1, end + 1
+    
+        # only read substrings w/o 0 in them of >= length of n
+        for digits in [s for s in substrings if len(s) > n]:
+            start, end = 0, n
+            while end <= len(digits):
+                substring = digits[start:end]
+                values = [int(c) for c in substring]
+                product = reduce(lambda x, y: x * y, values)
+                if product > largest_product:
+                    largest_product = product
+                start, end = start + 1, end + 1
+    
         return largest_product
 
 
