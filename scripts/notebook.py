@@ -41,6 +41,7 @@ def main():
     if args.refresh is False:
         view_docs()
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Manipulte Notebook")
     parser.add_argument('--refresh', '-r',
