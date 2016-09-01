@@ -4,29 +4,28 @@ MaxwellGBrown's Programming Notebook
 
 Hello!
 
-To build and view the Sphinx doc Notebook do the following:
+This is my personal public notebook. I maintain my code-snippets, brain dumps,
+examples, explanations with it's "pages".
+
+This notebook *requires* ``sphinx``. Make sure it's installed in whatever
+environment you're using.
 
 ::
 
-    python view_docs.py
-
-Please note you'll need to have sphinx installed to view them!
+  $ pip install sphinx
 
 
-----------------
-Easy Bash Access
-----------------
+To build the docs, install the package using ``setup.py``. I prefer to use it
+as a development-egg.
 
-Below is a script that curcumvents having to run ``view_docs.py`` to view Notebook.
+:: 
 
-::
-
-  #! /bin/bash 
-  <Notebook_virtualenv_path>/bin/python <Notebook_dir_path>/view_docs.py "$@"
+  $ python setup.py develop
 
 
-Add this script to ``~/bin/``, name the script ``notebook``, and then build the docs like this:
+After that, use the packaged ``notebook`` script to build & open them in your
+local browser!
 
 ::
 
-  user@host:~$ notebook
+  $ notebook
