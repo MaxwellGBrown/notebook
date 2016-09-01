@@ -85,3 +85,24 @@ Examples aren't necessarily functional examples, but more of a demonstration of 
    programming_patterns/metaclasses/metaclasses
 
 
+--------------
+Euler Problems
+--------------
+
+This section of my notebook is devoted to some answers I've created to the set of Euler problems coded in python.
+
+These have been answered by username **maxwellgbrown** on `Project Euler <https://projecteuler.net/>`__ and the numbers here corrospond to the numbers of those questions.
+
+.. warning::
+
+   Navigating to any page in this Table of Contents will provide a solution to the Euler problem it corrosponds to, thus spoiling that problem.
+
+   If you do not want to spoil any answers to Euler problems, **do not** navigate to those pages.
+
+
+.. toctree::
+   :name: euler_problems
+   :maxdepth: 1
+   :glob:
+
+   euler_problems/*
