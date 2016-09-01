@@ -34,7 +34,9 @@ The foundation for authentication is a model for users to authenticate themselve
 
 This basic user model defines usernames, passwords, and user_ids.
 
-The user's password is hashed so that it's not stored in the database as plain text.
+The user's password is salted & hashed so that it's not stored in the database as plain text.
+
+For more on how to properly store & manage passwords see `crackstation's hashing-security <https://crackstation.net/hashing-security.htm>`__ page.
 
 .. code-block:: python
 
@@ -62,7 +64,7 @@ The user's password is hashed so that it's not stored in the database as plain t
         @password.setter
         def set_password(self, password):
             # password arg is assumed UTF-8
-            salt = sha1(os.urandom(60))
+            salt = sha1(os.urandom(40))
             salted_pwd = password + salt.hexdigest()
             sha1_hash = sha1(salted_pwd.encode("UTF-8"))
             self._password = salt.hexdigest() + sha1_hash.hexdigest()
