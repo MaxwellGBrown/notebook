@@ -8,7 +8,10 @@ setup_kwargs = {
         "entry_points": {
             "console_scripts": [
                 "notebook = scripts.notebook:main",
-                ]
+                ],
+            "sphinx_themes": [
+                "path = sphinx_themes:get_path",
+                ],
             },
         }
 
