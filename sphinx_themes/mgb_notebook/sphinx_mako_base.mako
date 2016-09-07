@@ -1,5 +1,6 @@
 <html>
 	<head>
+	  <title>${title}</title>
 	  ${self.css()}
 	  ${self.js()}
 	</head>
@@ -8,6 +9,7 @@
 		${next.body()}
 	</body>
 </html>
+
 <%def name="css()">
     <link rel="stylesheet" href="${pathto('_static/' + style, 1)}" type="text/css" />
     <link rel="stylesheet" href="${pathto('_static/pygments.css', 1)}" type="text/css" />
