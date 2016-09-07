@@ -19,7 +19,7 @@
 <%def name="js()">
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '${"" if url_root is UNDEFINED else url_root}',
+        URL_ROOT:    '${"" if pathto("", 1) == "#" else pathto("", 1)}',
         VERSION:     '${release}',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '${'' if no_search_suffix else file_suffix}',
