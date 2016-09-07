@@ -3,12 +3,18 @@
 	  <title>${title}</title>
 	  ${self.css()}
 	  ${self.js()}
+
 	  % if use_opensearch:
-	    ${self.opensearch()}
+          <link rel="search" type="application/opensearchdescription+xml"
+                title="Search within ${docstitle}"
+                href="${pathto('_static/opensearch.xml', 1)}"/>
 	  % endif
+
 	  % if favicon:
 	    <link rel="shortcut icon" href="${pathto('_static/' + favicon, 1)}" />
 	  % endif
+
+	  ${self.linktags()}
 
 	</head>
 
@@ -40,8 +46,47 @@
 	% endfor
 </%def>
 
-<%def name="opensearch()">
-    <link rel="search" type="application/opensearchdescription+xml"
-          title="Search within ${docstitle}"
-          href="${pathto('_static/opensearch.xml', 1)}"/>
+<%def name="linktags()">
+
+	## about page
+	% if hasdoc('about'):
+    <link rel="author" title="${'About these documents'}" href="${pathto('about')}" />
+	% endif
+
+	## master index page
+    % if hasdoc('genindex'):
+    <link rel="index" title="${'Index'}" href="${pathto('genindex')}" />
+    % endif
+
+	## search page
+    % if hasdoc('search'):
+    <link rel="search" title="${'Search'}" href="${pathto('search')}" />
+    % endif
+
+	## copyright page
+    % if hasdoc('copyright'):
+    <link rel="copyright" title="${'Copyright'}" href="${pathto('copyright')}" />
+    % endif
+
+	## top of page
+    <link rel="top" title="${docstitle}" href="${pathto(master_doc)}" />
+
+	## next parent page
+    % if parents:
+    ## <link rel="up" title="${parents[-1].title}" href="${parents[-1]link}" />
+    <link rel="up" title="${parents[-1].get('title')}" href="${parents[-1].get('link')}" />
+    % endif
+
+	## next page in order
+    % if sphinx_next:
+    ## <link rel="next" title="${sphinx_next.title}" href="${sphinx_next.link}" />
+    <link rel="next" title="${sphinx_next.get('title')}" href="${sphinx_next.get('link')}" />
+    % endif
+
+	## previous page in order
+    % if prev:
+    ## <link rel="prev" title="${prev.title}" href="${prev.link}" />
+    <link rel="prev" title="${prev.get('title')}" href="${prev.get('link')}" />
+    % endif
+
 </%def>
