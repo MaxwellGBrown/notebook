@@ -1,1 +1,9 @@
-Hello World
+<%inherit file="sphinx_mako_base.mako"/>
+
+<ul>
+% for key in sorted(sphinx_context.keys()):
+  <li>${key}</li>
+% endfor
+</ul>
+
+${sphinx_context['body']}

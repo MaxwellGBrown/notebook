@@ -57,10 +57,10 @@ class MakoTemplateBridge(TemplateBridge):
         specified context (a Python dictionary)
         """
         tmpl = self.template_lookup.get_template(template)
-        return tmpl.render(**context)
+        return tmpl.render(sphinx_context=context)
 
     def render_string(self, template, context):
         """Called by the builder to render a template given as a string with a
         specified context"""
         tmpl = Template(template)
-        return tmpl.render(**context)
+        return tmpl.render(sphinx_context=context)
