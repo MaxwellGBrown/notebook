@@ -21,6 +21,12 @@
 	<body role="document">
 	    ## relbar1
 	    ${self.relbar()}
+
+		## render sidebar if it's set to?
+		## TODO: There's a LOT of sub-templates for the sidebar
+		% if (not embedded) and not theme_nosidebar and sidebars != []:
+		  ${self.render_sidebar()}
+		% endif
 		
 		${next.body()}
 		
@@ -117,4 +123,39 @@
 	  </ul>
 
 	</div>
+</%def>
+
+<%def name="render_sidebar()">
+    <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebarwrapper">
+        % if logo:
+          <p class="logo"><a href="${pathto(master_doc)}">
+            <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
+          </a></p>
+		% endif
+        ## {%- if sidebars != None %}
+        ##   {#- new style sidebar: explicitly include/exclude templates #}
+        ##   {%- for sidebartemplate in sidebars %}
+        ##   {%- include sidebartemplate %}
+        ##   {%- endfor %}
+        ## {%- else %}
+        ##   {#- old style sidebars: using blocks -- should be deprecated #}
+        ##   {%- block sidebartoc %}
+        ##   {%- include "localtoc.html" %}
+        ##   {%- endblock %}
+        ##   {%- block sidebarrel %}
+        ##   {%- include "relations.html" %}
+        ##   {%- endblock %}
+        ##   {%- block sidebarsourcelink %}
+        ##   {%- include "sourcelink.html" %}
+        ##   {%- endblock %}
+        ##   {%- if customsidebar %}
+        ##   {%- include customsidebar %}
+        ##   {%- endif %}
+        ##   {%- block sidebarsearch %}
+        ##   {%- include "searchbox.html" %}
+        ##   {%- endblock %}
+        ## {%- endif %}
+      </div>
+    </div>
 </%def>
