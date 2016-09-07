@@ -6,6 +6,10 @@
 	  % if use_opensearch:
 	    ${self.opensearch()}
 	  % endif
+	  % if favicon:
+	    <link rel="shortcut icon" href="${pathto('_static/' + favicon, 1)}" />
+	  % endif
+
 	</head>
 
 	<body>
