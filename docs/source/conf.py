@@ -140,10 +140,6 @@ html_theme = 'mgb_notebook'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-## ADDED BY MBROWN ##
-# so I can give code blocks better :caption: s
-html_style = 'css/customizations.css'
-
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
