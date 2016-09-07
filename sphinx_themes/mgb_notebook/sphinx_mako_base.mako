@@ -3,6 +3,9 @@
 	  <title>${title}</title>
 	  ${self.css()}
 	  ${self.js()}
+	  % if use_opensearch:
+	    ${self.opensearch()}
+	  % endif
 	</head>
 
 	<body>
@@ -31,4 +34,10 @@
 	% for script_file in script_files:
     <script type="text/javascript" src="${pathto(script_file, 1)}"></script>
 	% endfor
+</%def>
+
+<%def name="opensearch()">
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within ${docstitle}"
+          href="${pathto('_static/opensearch.xml', 1)}"/>
 </%def>
