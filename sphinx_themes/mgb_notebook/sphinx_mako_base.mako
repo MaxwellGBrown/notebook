@@ -18,8 +18,14 @@
 
 	</head>
 
-	<body>
+	<body role="document">
+	    ## relbar1
+	    ${self.relbar()}
+		
 		${next.body()}
+		
+	    ## relbar2
+		${self.relbar()}
 	</body>
 </html>
 
@@ -89,4 +95,26 @@
     <link rel="prev" title="${prev.get('title')}" href="${prev.get('link')}" />
     % endif
 
+</%def>
+
+<%def name="relbar()">
+    <div class="related" role="navigation">
+	  <h3>Navigation</h3>
+	  <ul>
+	    % for rellink in rellinks:
+		  <li class="right">
+		  ##   <a href="${pathto(rellink[0])}" title="${rellink[1]}" ${accesskey(rellink[2])}>${rellink[3]}</a>
+		    <a href="${pathto(rellink[0])}" title="${rellink[1]}">${rellink[3]}</a>
+		  </li>
+		% endfor
+
+	    <li class="nav-item nav-item-0"><a href="${pathto(master_doc)}">${shorttitle}</a></li>
+
+		% for sphinx_parent in parents:
+		  <li class="nav-item nav-item-${parents.index(sphinx_parent)}"><a href="${sphinx_parent.get('link')}">${sphinx_parent.get('title')}</a>
+		  ## <li class="nav-item nav-item-${parents.index(sphinx_parent)}"><a href="${parent.link}">${parent.title}</a>
+		% endfor
+	  </ul>
+
+	</div>
 </%def>
