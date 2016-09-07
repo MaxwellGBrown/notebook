@@ -1,6 +1,5 @@
 ﻿import argparse
 import os
-import shutil
 import webbrowser
 
 
@@ -26,8 +25,7 @@ def view_docs():
 
 def destroy_build():
     print("Destroying previous build...")
-    build_path = os.path.join(DOCS, "build")
-    shutil.rmtree(build_path)
+    os.system("cd {} && make clean".format(DOCS))
 
 
 def main():
