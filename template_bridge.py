@@ -56,11 +56,17 @@ class MakoTemplateBridge(TemplateBridge):
         Called by the builder to render a template given as a filename with a
         specified context (a Python dictionary)
         """
+        for mako_keyword in ["body", "next", "self", "parent"]:
+            if mako_keyword in context:
+                context['sphinx_' + mako_keyword] = context.pop(mako_keyword)
         tmpl = self.template_lookup.get_template(template)
-        return tmpl.render(sphinx_context=context)
+        return tmpl.render(**context)
 
     def render_string(self, template, context):
         """Called by the builder to render a template given as a string with a
         specified context"""
+        for mako_keyword in ["body", "next", "self", "parent", "locals"]:
+            if mako_keyword in context:
+                context['sphinx_' + mako_keyword] = context.pop(mako_keyword)
         tmpl = Template(template)
         return tmpl.render(sphinx_context=context)
