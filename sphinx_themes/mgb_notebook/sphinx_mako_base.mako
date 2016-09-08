@@ -22,11 +22,13 @@
 	</head>
 
 	<body role="document">
+        ${self.header()}
+
 	    ## relbar1
 	    ${self.relbar("fixed-top")}
 
 		## render available sidebars?
-		% if (not embedded) and not theme_nosidebar and sidebars != []:
+		% if not embedded and not theme_nosidebar and sidebars != []:
 		  ${self.render_sidebar()}
 		% endif
 
@@ -116,6 +118,9 @@
 
 </%def>
 
+<%def name="header()">
+</%def>
+
 <%def name="relbar(*nav_classes)">
     <% nav_class = " ".join(["navbar"] + list(nav_classes)) %>
     <nav class="related ${nav_class}" role="navigation">
@@ -141,26 +146,51 @@
 </%def>
 
 <%def name="render_sidebar()">
-    <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-      <div class="sphinxsidebarwrapper">
+  <div class="sidebar">
+    <ul class="nav nav-sidebar">
+    ## <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      ## <div class="sphinxsidebarwrapper">
         % if logo is not UNDEFINED and logo:
-          <p class="logo">
-		    <a href="${pathto(master_doc)}">
-              <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
-            </a>
-		  </p>
+          ## <p class="logo">
+		  ##   <a href="${pathto(master_doc)}">
+          ##     <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
+          ##   </a>
+		  ## </p>
+		  <li class="nav-item">
+		    <a class="nav-link">
+			  <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
+			</a>
+		  </li>
 		% endif
+
+        <%doc>
+		Sphinx wants you to include the sidebars you want in your page as part of the conf.py in the source directory.
+		Alongside this, there are a few "builtin" sidebar templates that can be rendered:
+		  * localtoc.html - a fine-grained table of contents of the current document
+		  * globaltoc.html - a coarse-grained table of contents for the whole documentation set, collapsed
+		  * relations.html - two links to the previous and next documents
+		  * sourcelink.html - a link to the source of the current document, if enabled in ``html_show_sourcelink``
+		  * searchbox.html - the "quick search" box
+
+		They made a conscious decision moving away from blocked-sidebars, and prefer that sidebars be included dynamically like this.
+
+		For now, they'll remain as part of this block, but ideally they should be sub-templates.
+		</%doc>
 		
 		## Render each sidebartemplate in ``sidebars``
 		% if sidebars is not UNDEFINED and sidebars is not None:
 		  % for sidebar in sidebars:
-		    ## TODO: import sidebar template & render it
-            ## {%- include sidebartemplate %}
+		    ## TODO: Render `sidebar` (which is a str of a sidebar-template's filename)
 		  % endfor
 		% endif
 
-      </div>
-    </div>
+		## localtoc
+		${context.get('toc')}
+
+      ## </div>
+    ## </div>
+	</ul> <!-- class="nav" -->
+  </div> <!-- class="sidebar" -->
 </%def>
 
 <%def name="footer()">
