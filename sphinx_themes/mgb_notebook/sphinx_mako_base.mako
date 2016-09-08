@@ -29,13 +29,15 @@
 		% if (not embedded) and not theme_nosidebar and sidebars != []:
 		  ${self.render_sidebar()}
 		% endif
+
 		
 		<div class="document container">
 		  <div class="documentwrapper">
 		    <div class="body" role="main">
+		      ${debug()}
 		      ${next.body()}
 			</div>
-		  <div class="documentwrapper">
+		  </div>
 		</div>
 		
 	    ## relbar2
@@ -142,9 +144,11 @@
     <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
       <div class="sphinxsidebarwrapper">
         % if logo is not UNDEFINED and logo:
-          <p class="logo"><a href="${pathto(master_doc)}">
-            <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
-          </a></p>
+          <p class="logo">
+		    <a href="${pathto(master_doc)}">
+              <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
+            </a>
+		  </p>
 		% endif
 		
 		## Render each sidebartemplate in ``sidebars``
@@ -180,4 +184,29 @@
   <link rel="stylesheet" href="${pathto('_static/bootstrap/css/bootstrap.css', 1)}" type="text/css" />
   <script type="text/javascript" src="${pathto('_static/tether/js/tether.js', 1)}"></script>
   <script type="text/javascript" src="${pathto('_static/bootstrap/js/bootstrap.js', 1)}"></script>
+</%def>
+
+<%def name="debug()">
+  <a href="#" data-toggle="modal" data-target="#debug_modal">debug</a>
+
+  <div id="debug_modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+	  <div class="modal-content">
+	    <div class="modal-header">
+		  <h1 class="modal-title">Sphinx Context</h1>
+		</div>
+		<div class="modal-body">
+          <ul>
+            % for key in sorted(context['pageargs'].keys()):
+              % if key == "sphinx_body":
+                <li><b>${key}</b>: See the non-debug for the body!</li>
+              % else:
+                <li><b>${key}</b>: ${context.get(key)}</li>
+              % endif
+            % endfor
+          </ul>
+		</div>
+	  </div>
+	</div>
+  </div>
 </%def>
