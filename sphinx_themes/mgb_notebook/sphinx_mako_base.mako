@@ -37,6 +37,9 @@
 		
 	    ## relbar2
 		${self.relbar()}
+
+		${self.footer()}
+
 	</body>
 </html>
 
@@ -147,4 +150,20 @@
 
       </div>
     </div>
+</%def>
+
+<%def name="footer()">
+    <div class="footer">
+	  % if hasdoc('copyright'):
+	    &#169; <a href="${pathto('copyright')}">Copyright</a>
+	  % endif
+
+	  % if last_updated is not UNDEFINED and last_updated is not None:
+	    Last updated on ${last_updated}
+	  % endif
+
+	  % if show_sphinx is not UNDEFINED:
+	    <a href="http://sphinx-doc.org/">Sphinx</a> ${sphinx_version}
+	  % endif
+	</div>
 </%def>
