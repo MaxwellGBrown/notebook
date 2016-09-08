@@ -1,6 +1,6 @@
 <html>
 	<head>
-	  <title>${title}</title>
+	  <title>${title or docstitle}</title>
 	  ${self.js()}
 
 	  ## Bootstrap4 *after* jQuery but *before* styling
