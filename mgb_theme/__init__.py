@@ -14,6 +14,11 @@ def update_context(app, pagename, templatename, context, doctree):
 def setup(app):
     app.connect('html-page-context', update_context)
 
+    # This extension REQUIRES that the accomodating theme is used
+    app.config['html_theme'] = "mgb_theme"
+
+    # connect to the template bridge!
+    app.config["template_bridge"] = "mgb_theme.template_bridge.MakoTemplateBridge"
     # add bootstrap4 css & js (tether is required for bootstrap4 popovers)
     app.add_stylesheet("tether/css/tether.css")
     app.add_stylesheet("bootstrap/css/bootstrap.css")

@@ -284,8 +284,5 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
-
-template_bridge = "template_bridge.MakoTemplateBridge"
-
-html_theme = 'mgb_theme'
+# html_theme = 'mgb_theme'
 extensions += ['mgb_theme']
