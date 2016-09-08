@@ -10,7 +10,7 @@ setup_kwargs = {
                 "notebook = scripts.notebook:main",
                 ],
             "sphinx_themes": [
-                "path = sphinx_themes:get_path",
+                "path = mgb_theme:get_path",
                 ],
             },
         }
