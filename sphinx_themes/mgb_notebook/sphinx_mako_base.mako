@@ -144,7 +144,7 @@
 <%def name="render_sidebar()">
     <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
       <div class="sphinxsidebarwrapper">
-        % if logo is not UNDEFINED and logo is not None:
+        % if logo is not UNDEFINED and logo:
           <p class="logo"><a href="${pathto(master_doc)}">
             <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
           </a></p>
