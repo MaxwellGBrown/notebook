@@ -33,14 +33,14 @@
 
 	<body role="document">
 	    ## relbar1
-	    ${self.relbar()}
+	    ${self.relbar("fixed-top")}
 
 		## render available sidebars?
 		% if (not embedded) and not theme_nosidebar and sidebars != []:
 		  ${self.render_sidebar()}
 		% endif
 		
-		<div class="document">
+		<div class="document container">
 		  <div class="documentwrapper">
 		    <div class="body" role="main">
 		      ${next.body()}
@@ -49,7 +49,7 @@
 		</div>
 		
 	    ## relbar2
-		${self.relbar()}
+		${self.relbar("fixed-bottom")}
 
 		${self.footer()}
 
@@ -124,26 +124,28 @@
 
 </%def>
 
-<%def name="relbar()">
-    <div class="related" role="navigation">
-	  <h3>Navigation</h3>
-	  <ul>
-	    % for rellink in rellinks:
-		  <li class="right">
-		  ##   <a href="${pathto(rellink[0])}" title="${rellink[1]}" ${accesskey(rellink[2])}>${rellink[3]}</a>
-		    <a href="${pathto(rellink[0])}" title="${rellink[1]}">${rellink[3]}</a>
-		  </li>
-		% endfor
+<%def name="relbar(*nav_classes)">
+    <% nav_class = " ".join(["navbar"] + list(nav_classes)) %>
+    <nav class="related ${nav_class}" role="navigation">
+	  <div class="container">
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="${pathto(master_doc)}">${shorttitle}</a>
+	      <ul class="nav navbar-nav pull-xs-right">
+	        % for rellink in rellinks:
+	          <li class="nav-item">
+	            <a class="nav-link" href="${pathto(rellink[0])}" title="${rellink[1]}">${rellink[3]}</a>
+	            ##   <a href="${pathto(rellink[0])}" title="${rellink[1]}" ${accesskey(rellink[2])}>${rellink[3]}</a>
+	          </li>
+	        % endfor
 
-	    <li class="nav-item nav-item-0"><a href="${pathto(master_doc)}">${shorttitle}</a></li>
-
-		% for sphinx_parent in parents:
-		  <li class="nav-item nav-item-${parents.index(sphinx_parent)}"><a href="${sphinx_parent.get('link')}">${sphinx_parent.get('title')}</a>
-		  ## <li class="nav-item nav-item-${parents.index(sphinx_parent)}"><a href="${parent.link}">${parent.title}</a>
-		% endfor
-	  </ul>
-
-	</div>
+	        % for sphinx_parent in parents:
+	          <li class="nav-item nav-item-${parents.index(sphinx_parent)}"><a class="nav-link" href="${sphinx_parent.get('link')}">${sphinx_parent.get('title')}</a></li>
+	          ## <li class="nav-item nav-item-${parents.index(sphinx_parent)}"><a href="${parent.link}">${parent.title}</a>
+	        % endfor
+	      </ul>
+		</div>
+	  </div>
+	</nav>
 </%def>
 
 <%def name="render_sidebar()">
