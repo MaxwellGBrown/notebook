@@ -17,3 +17,6 @@ basicstrap
 ----------
 https://github.com/tell-k/sphinxjp.themes.basicstrap/tree/master/src
 """
+
+# To use a custom writer, you'll also probably have to define a special builder
+# class that specifically uses that builder.
