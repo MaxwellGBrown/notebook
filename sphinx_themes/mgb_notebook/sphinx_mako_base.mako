@@ -4,9 +4,14 @@
 
 	  ## Add Bootstrap4 to script_files & css_files before rendering
 	  <%
+        # bootstrap4s popups requires tether
+        css_files.append("_static/tether/css/tether.css")
+        script_files.append("_static/tether/js/tether.js")
+
         # all files from theme & source static go to _static
         css_files.append("_static/bootstrap/css/bootstrap.css")
         script_files.append("_static/bootstrap/js/bootstrap.js")
+
       %>
 
 	  ${self.js()}
