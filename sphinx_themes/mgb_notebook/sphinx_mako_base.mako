@@ -1,8 +1,12 @@
 <html>
 	<head>
 	  <title>${title}</title>
-	  ${self.css()}
 	  ${self.js()}
+
+	  ## Bootstrap4 *after* jQuery but *before* styling
+	  ${self.bootstrap4()}
+
+	  ${self.css()}
 
 	  % if use_opensearch:
           <link rel="search" type="application/opensearchdescription+xml"
@@ -64,6 +68,10 @@
 	% for script_file in script_files:
     <script type="text/javascript" src="${pathto(script_file, 1)}"></script>
 	% endfor
+</%def>
+
+<%def name="bootstrap4()">
+  ## Bootstrap4
 </%def>
 
 <%def name="linktags()">
@@ -136,17 +144,19 @@
 <%def name="render_sidebar()">
     <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
       <div class="sphinxsidebarwrapper">
-        % if logo:
+        % if logo is not UNDEFINED and logo is not None:
           <p class="logo"><a href="${pathto(master_doc)}">
             <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
           </a></p>
 		% endif
 		
 		## Render each sidebartemplate in ``sidebars``
-		% for sidebar in sidebars:
-		  ## TODO: import sidebar template & render it
-          ## {%- include sidebartemplate %}
-		% endfor
+		% if sidebars is not UNDEFINED and sidebars is not None:
+		  % for sidebar in sidebars:
+		    ## TODO: import sidebar template & render it
+            ## {%- include sidebartemplate %}
+		  % endfor
+		% endif
 
       </div>
     </div>
