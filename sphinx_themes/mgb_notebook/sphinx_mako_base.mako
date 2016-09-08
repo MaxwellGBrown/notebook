@@ -3,6 +3,7 @@
 	  <title>${title or docstitle}</title>
 
 	  ${self.js()}
+	  ## bootstrap needs jQuery imported first!
 	  ${self.bootstrap4()}
 	  ${self.css()}
 
@@ -175,8 +176,8 @@
 </%def>
 
 <%def name="bootstrap4()">
-      <link rel="stylesheet" href="${pathto('_static/tether/css/tether.css', 1)}" type="text/css" />
-      <link rel="stylesheet" href="${pathto('_static/bootstrap/css/bootstrap.css', 1)}" type="text/css" />
-      <script type="text/javascript" src="${pathto('_static/tether/js/tether.js', 1)}"></script>
-      <script type="text/javascript" src="${pathto('_static/bootstrap/js/bootstrap.js', 1)}"></script>
+  <link rel="stylesheet" href="${pathto('_static/tether/css/tether.css', 1)}" type="text/css" />
+  <link rel="stylesheet" href="${pathto('_static/bootstrap/css/bootstrap.css', 1)}" type="text/css" />
+  <script type="text/javascript" src="${pathto('_static/tether/js/tether.js', 1)}"></script>
+  <script type="text/javascript" src="${pathto('_static/bootstrap/js/bootstrap.js', 1)}"></script>
 </%def>
