@@ -2,19 +2,8 @@
 	<head>
 	  <title>${title or docstitle}</title>
 
-	  ## Add Bootstrap4 to script_files & css_files before rendering
-	  <%
-        # bootstrap4s popups requires tether
-        css_files.append("_static/tether/css/tether.css")
-        script_files.append("_static/tether/js/tether.js")
-
-        # all files from theme & source static go to _static
-        css_files.append("_static/bootstrap/css/bootstrap.css")
-        script_files.append("_static/bootstrap/js/bootstrap.js")
-
-      %>
-
 	  ${self.js()}
+	  ${self.bootstrap4()}
 	  ${self.css()}
 
 	  % if use_opensearch:
@@ -183,4 +172,11 @@
 	    <a href="http://sphinx-doc.org/">Sphinx</a> ${sphinx_version}
 	  % endif
 	</div>
+</%def>
+
+<%def name="bootstrap4()">
+      <link rel="stylesheet" href="${pathto('_static/tether/css/tether.css', 1)}" type="text/css" />
+      <link rel="stylesheet" href="${pathto('_static/bootstrap/css/bootstrap.css', 1)}" type="text/css" />
+      <script type="text/javascript" src="${pathto('_static/tether/js/tether.js', 1)}"></script>
+      <script type="text/javascript" src="${pathto('_static/bootstrap/js/bootstrap.js', 1)}"></script>
 </%def>
