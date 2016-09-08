@@ -1,11 +1,14 @@
 <html>
 	<head>
 	  <title>${title or docstitle}</title>
+
+	  ## Add Bootstrap4 to script_files & css_files
+	  <%
+        css_files.append("_static/bootstrap/css/bootstrap.css")
+        script_files.append("_static/bootstrap/js/bootstrap.js")
+      %>
+
 	  ${self.js()}
-
-	  ## Bootstrap4 *after* jQuery but *before* styling
-	  ${self.bootstrap4()}
-
 	  ${self.css()}
 
 	  % if use_opensearch:
@@ -68,10 +71,6 @@
 	% for script_file in script_files:
     <script type="text/javascript" src="${pathto(script_file, 1)}"></script>
 	% endfor
-</%def>
-
-<%def name="bootstrap4()">
-  ## Bootstrap4
 </%def>
 
 <%def name="linktags()">
