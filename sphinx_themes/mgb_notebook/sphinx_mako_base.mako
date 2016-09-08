@@ -22,13 +22,18 @@
 	    ## relbar1
 	    ${self.relbar()}
 
-		## render sidebar if it's set to?
-		## TODO: There's a LOT of sub-templates for the sidebar
+		## render available sidebars?
 		% if (not embedded) and not theme_nosidebar and sidebars != []:
 		  ${self.render_sidebar()}
 		% endif
 		
-		${next.body()}
+		<div class="document">
+		  <div class="documentwrapper">
+		    <div class="body" role="main">
+		      ${next.body()}
+			</div>
+		  <div class="documentwrapper">
+		</div>
 		
 	    ## relbar2
 		${self.relbar()}
@@ -133,29 +138,13 @@
             <img class="logo" src="${pathto('_static/' + logo, 1)}" alt="Logo"/>
           </a></p>
 		% endif
-        ## {%- if sidebars != None %}
-        ##   {#- new style sidebar: explicitly include/exclude templates #}
-        ##   {%- for sidebartemplate in sidebars %}
-        ##   {%- include sidebartemplate %}
-        ##   {%- endfor %}
-        ## {%- else %}
-        ##   {#- old style sidebars: using blocks -- should be deprecated #}
-        ##   {%- block sidebartoc %}
-        ##   {%- include "localtoc.html" %}
-        ##   {%- endblock %}
-        ##   {%- block sidebarrel %}
-        ##   {%- include "relations.html" %}
-        ##   {%- endblock %}
-        ##   {%- block sidebarsourcelink %}
-        ##   {%- include "sourcelink.html" %}
-        ##   {%- endblock %}
-        ##   {%- if customsidebar %}
-        ##   {%- include customsidebar %}
-        ##   {%- endif %}
-        ##   {%- block sidebarsearch %}
-        ##   {%- include "searchbox.html" %}
-        ##   {%- endblock %}
-        ## {%- endif %}
+		
+		## Render each sidebartemplate in ``sidebars``
+		% for sidebar in sidebars:
+		  ## TODO: import sidebar template & render it
+          ## {%- include sidebartemplate %}
+		% endfor
+
       </div>
     </div>
 </%def>
