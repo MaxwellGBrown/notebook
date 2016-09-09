@@ -28,6 +28,19 @@ from sphinx.writers.html import HTMLTranslator as sphinx_HTMLTranslator
 from sphinx.locale import _, admonitionlabels
 
 
+admonition_card_cls = {
+        # matches admonition with key name to it's bootstrap helper class
+        "note": "primary",
+        "warning": "danger",
+        "danger": "danger",
+        "error": "danger",
+        "hint": "info",
+        "important": "warning",
+        "tip": "success",
+        "todo": "warning",
+        }
+
+
 class BootstrapTranslator(sphinx_HTMLTranslator):
     """
     Inherits from sphinx.writers.html.HTMLTranslator which extends docutils'
@@ -36,6 +49,8 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
 
     def __init__(self, *args, **kwargs):
         sphinx_HTMLTranslator.__init__(self, *args, **kwargs)
+        self.theme_options = self.builder.theme_options
+        self.theme_options['outlined_admonitions'] = False
 
     def visit_literal(self, node):
         # docutils uses <code></code> instead of a bunch of junk like sphinx
@@ -104,15 +119,24 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
 
         self.body.append('</div>\n')
 
-    # --- all admonitions -----------------------------------------------------
     def visit_admonition(self, node, name=''):
         """ These are the notes, warnings, etc.
 
         Theses are also implemented as bootstrap cards.
         """
-        # create admonition card
-        node_cls = " ".join(["card", "admonition", name])
+        admonition_classes = ["card", "admonition", name]
+        helper_cls = admonition_card_cls.get(name, "primary")
+
+        # Set this admonition up with a card-outline or as an inverse card
+        # print(self.theme_options.get('outlined_admonitions'))
+        if self.theme_options.get('outlined_admonitions', True) is True:
+            admonition_classes.append("card-outline-{}".format(helper_cls))
+        else:
+            admonition_classes.extend(["card-inverse", "card-" + helper_cls])
+
+        node_cls = " ".join(admonition_classes)
         self.body.append(self.starttag(node, "div", CLASS=node_cls))
+        node.bootstrap_cls = helper_cls
 
         # add a card header if available
         if name:
@@ -120,11 +144,24 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
 
         # self.set_first_last(node)
 
+    def depart_admonition(self, node=None):
+        self.body.append("</div>\n")  # terminate card-body
+        self.body.append("</div>\n")  # terminate card
+
     def visit_title(self, node):
         """ If parent is node.Admonition then add a card-header """
         if isinstance(node.parent, nodes.Admonition):
-            card_head_cls = " ".join(["card-header", "admonition-title"])
-            self.body.append(self.starttag(dict(), "div", CLASS=card_head_cls))
+            # set up card-header classes
+            card_header_classes = ['card-header', 'admonition-title']
+
+            if self.theme_options.get('outlined_admonitions', True) is True:
+                bg_class = "bg-{}".format(node.parent.bootstrap_cls)
+                card_header_classes.append(bg_class)
+            else:
+                card_header_classes.append("card-title")
+
+            title_cls = " ".join(card_header_classes)
+            self.body.append(self.starttag(dict(), "div", CLASS=title_cls))
             self.context.append("</div>\n")  # depart title closes w/ this
         else:
             super().visit_title(node)
@@ -133,43 +170,23 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
         if isinstance(node.parent, nodes.Admonition) is True:
             # begin the card-body
             self.body.append(self.starttag(dict(), "div", CLASS="card-block"))
-            self.context.append("</div>\n")
+
+            # begin the card-text
+            card_text_classes = ['card-text']
+
+            # give contextual text-class if outlined
+            if self.theme_options.get('outlined_admonitions', True) is True:
+                text_cls = "text-{}".format(node.parent.bootstrap_cls)
+                card_text_classes.append(text_cls)
+            else:
+                pass  # no extra classes for backgrounded!
+
+            card_text_cls = ' '.join(card_text_classes)
+            self.body.append(self.starttag(dict(), "p", CLASS=card_text_cls))
+
+            # set the closing tag for both .card-text & .card-body
+            self.context.append("</p>\n</div>\n")
         else:
             super().visit_paragraph(node)
-
-    def depart_admonition(self, node=None):
-        self.body.append("</div>\n")  # terminate card-body
-        self.body.append("</div>\n")  # terminate card
-
-    def visit_note(self, node):
-        self.visit_admonition(node, 'note')
-
-    def depart_note(self, node):
-        self.depart_admonition(node)
-
-    def visit_warning(self, node):
-        self.visit_admonition(node, 'warning')
-
-    def depart_warning(self, node):
-        self.depart_admonition(node)
-
-    def visit_attention(self, node):
-        self.visit_admonition(node, 'attention')
-
-    def visit_danger(self, node):
-        self.visit_admonition(node, 'danger')
-
-    def visit_error(self, node):
-        self.visit_admonition(node, 'error')
-
-    def visit_hint(self, node):
-        self.visit_admonition(node, 'hint')
-
-    def visit_important(self, node):
-        self.visit_admonition(node, 'important')
-
-    def visit_tip(self, node):
-        self.visit_admonition(node, 'tip')
-    # --- end admonitions -----------------------------------------------------
 
 
