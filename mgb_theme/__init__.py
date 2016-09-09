@@ -17,7 +17,7 @@ def setup(app):
     app.connect('html-page-context', update_context)
 
     # This extension REQUIRES that the accomodating theme is used
-    app.config['html_theme'] = "mgb_theme"
+    app.config.html_theme = "mgb_theme"
 
     # connect to the template bridge!
     app.config["template_bridge"] = "mgb_theme.template_bridge.MakoTemplateBridge"
