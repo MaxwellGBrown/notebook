@@ -117,6 +117,9 @@
 </%def>
 
 <%def name="header()">
+  <header>
+    Header
+  </header>
 </%def>
 
 <%def name="relbar(*nav_classes)">
