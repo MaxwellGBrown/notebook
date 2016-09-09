@@ -1,5 +1,7 @@
 ﻿import os
 
+from mgb_theme.bootstrap_writer import BootstrapTranslator
+
 
 def get_path():
     """ Entrypoint for setup.py """
@@ -19,6 +21,10 @@ def setup(app):
 
     # connect to the template bridge!
     app.config["template_bridge"] = "mgb_theme.template_bridge.MakoTemplateBridge"
+
+    # use BootstrapTranslator to build bootstrap-compatable HTML from .rst
+    app.set_translator("html", BootstrapTranslator)
+
     # add bootstrap4 css & js (tether is required for bootstrap4 popovers)
     app.add_stylesheet("tether/css/tether.css")
     app.add_stylesheet("bootstrap/css/bootstrap.css")
