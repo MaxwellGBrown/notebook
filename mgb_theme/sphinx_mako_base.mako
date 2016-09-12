@@ -31,13 +31,7 @@
 		  ## render available sidebars?
 		  <% include_sidebars = not embedded and not theme_nosidebar and sidebars != [] %>
 		  % if include_sidebars is True:
-		    <div id="sidebar-wrapper" class="col-sm-3">
-		      ${self.render_sidebar()}
-		    </div>
-
-		    <div id="sidebar-toggle">
-		      
-		    </div>
+		    ${self.render_sidebar()}
 		  % endif
 
 		  
@@ -62,17 +56,6 @@
 		${self.relbar("fixed-bottom")}
 
 		${self.footer()}
-
-		<script>
-		  $("#sidebar-toggle").click(function(e) {
-		 	e.preventDefault(); 
-			$("#sidebar-wrapper").toggleClass("toggled");
-			$("#sidebar-wrapper").toggleClass("col-sm-3");
-
-			$("#page-content-wrapper").toggleClass("col-sm-9");
-			$("#page-content-wrapper").toggleClass("col-sm-12");
-		  });
-		</script>
 
 	</body>
 </html>
@@ -183,6 +166,7 @@
 </%def>
 
 <%def name="render_sidebar()">
+<div id="sidebar-wrapper" class="col-sm-3">
   <div id="sidebar">
     ## <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
       ## <div class="sphinxsidebarwrapper">
@@ -226,6 +210,38 @@
       ## </div>
     ## </div>
   </div> <!-- class="sidebar" -->
+
+</div>
+
+<div id="sidebar-toggle" class="opened">
+  <span id="toggle-symbol">&#171;</span>
+</div>
+
+<script>
+  console.log($("#sidebar").offset().top);
+  $("#sidebar").sticky({topSpacing: $("#sidebar").position().top});
+
+  $("#sidebar-toggle").click(function(e) {
+ 	e.preventDefault(); 
+	$("#sidebar-wrapper").toggleClass("toggled");
+	$("#sidebar-wrapper").toggleClass("col-sm-3");
+
+	$("#page-content-wrapper").toggleClass("col-sm-9");
+	$("#page-content-wrapper").toggleClass("col-sm-12");
+
+	// Change the symbol in the sidebar-toggle
+	if ($("#sidebar-toggle").hasClass("opened")){
+		$("#sidebar-toggle").removeClass("opened");
+		$("#sidebar-toggle").addClass("closed");
+		$("#toggle-symbol").html("&#187;");
+	}
+	else {
+		$("#sidebar-toggle").removeClass("closed");
+		$("#sidebar-toggle").addClass("opened");
+		$("#toggle-symbol").html("&#171;");
+	};
+  });
+</script>
 </%def>
 
 <%def name="footer()">
