@@ -25,6 +25,8 @@
 	    ## relbar1
 	    ${self.relbar("fixed-top")}
 
+		## Page structure based off of 
+		## https://github.com/BlackrockDigital/startbootstrap-simple-sidebar
 		<div id="main-wrapper">
 		  ## render available sidebars?
 		  <% include_sidebars = not embedded and not theme_nosidebar and sidebars != [] %>
@@ -34,7 +36,7 @@
 		    </div>
 
 		    <div id="sidebar-toggle">
-		      X
+		      
 		    </div>
 		  % endif
 
