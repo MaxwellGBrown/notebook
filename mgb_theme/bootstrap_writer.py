@@ -57,6 +57,20 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
         # this "hack" works to FINALLY get the theme's options
         self.theme_options = self.builder.theme.get_options({})
 
+    def get_theme_option(self, key):
+        """ facilitates access of self.builder.theme.get_options """
+        raw_value = self.theme_options.get(key)
+        if isinstance(raw_value, str) is True:
+            if raw_value.lower() == "true":
+                return True
+            elif raw_value.lower() == "false":
+                return False
+            else:
+                return raw_value
+        else:
+            return raw_value
+
+
     def visit_literal(self, node):
         # docutils uses <code></code> instead of a bunch of junk like sphinx
         return docutils_HTMLTranslator.visit_literal(self, node)
@@ -133,8 +147,7 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
         helper_cls = admonition_card_cls.get(name, "primary")
 
         # Set this admonition up with a card-outline or as an inverse card
-        # print(self.theme_options.get('outlined_admonitions'))
-        if self.theme_options.get('outlined_admonitions', True) is True:
+        if self.get_theme_option('outlined_admonitions') is True:
             admonition_classes.append("card-outline-{}".format(helper_cls))
         else:
             admonition_classes.extend(["card-inverse", "card-" + helper_cls])
@@ -159,7 +172,7 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
             # set up card-header classes
             card_header_classes = ['card-header', 'admonition-title']
 
-            if self.theme_options.get('outlined_admonitions', True) is True:
+            if self.get_theme_option('outlined_admonitions') is True:
                 bg_class = "bg-{}".format(node.parent.bootstrap_cls)
                 card_header_classes.append(bg_class)
             else:
@@ -180,7 +193,7 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
             card_text_classes = ['card-text']
 
             # give contextual text-class if outlined
-            if self.theme_options.get('outlined_admonitions', True) is True:
+            if self.get_theme_option('outlined_admonitions') is True:
                 text_cls = "text-{}".format(node.parent.bootstrap_cls)
                 card_text_classes.append(text_cls)
             else:
