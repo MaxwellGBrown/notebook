@@ -25,23 +25,23 @@
 	    ## relbar1
 	    ${self.relbar("fixed-top")}
 
-		<div class="document container-fluid">
+		<div class="doc-wrapper container-fluid" style="display: flex;">
 		## render available sidebars?
 		<% include_sidebars = not embedded and not theme_nosidebar and sidebars != [] %>
 		% if include_sidebars is True:
-		  <div class="sidebar-wrapper col-sm-3">
+		  <div class="col-sm-3">
 		    ${self.render_sidebar()}
 		  </div>
 		% endif
 
 		
 		% if include_sidebars is True:
-		  <% docwrapper_classes = ['documentwrapper', 'col-sm-9'] %>
+		  <% docwrapper_classes = ['col-sm-9'] %>
 		% else:
-		  <% docwrapper_classes = ['documentwrapper', 'col-sm-12'] %>
+		  <% docwrapper_classes = ['col-sm-12'] %>
 		% endif
 		  <div class="${' '.join(docwrapper_classes)}">
-		    <div class="body" role="main">
+		    <div>
 		      ${next.body()}
 
 			  % if context.get("theme_include_debug") is not UNDEFINED:
