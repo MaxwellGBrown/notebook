@@ -21,3 +21,28 @@ p.caption:hover > a.headerlink,
 div.code-block-caption:hover > a.headerlink {
 	    visibility: visible;
     }
+
+.doc-container {
+    display: flex;
+}
+
+header {
+    background-color: red;
+}
+
+footer {
+    background-color: green;
+}
+
+.sidebar {
+    background-color: blue;
+}
+
+.document {
+    background-color: orange;
+}
+
+.related {
+    background-color: yellow;
+}
+
