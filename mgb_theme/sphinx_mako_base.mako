@@ -25,34 +25,52 @@
 	    ## relbar1
 	    ${self.relbar("fixed-top")}
 
-		<div class="doc-container container-fluid">
-		## render available sidebars?
-		<% include_sidebars = not embedded and not theme_nosidebar and sidebars != [] %>
-		% if include_sidebars is True:
-		  ${self.render_sidebar()}
-		% endif
+		<div id="main-wrapper">
+		  ## render available sidebars?
+		  <% include_sidebars = not embedded and not theme_nosidebar and sidebars != [] %>
+		  % if include_sidebars is True:
+		    <div id="sidebar-wrapper" class="col-sm-3">
+		      ${self.render_sidebar()}
+		    </div>
 
-		
-		% if include_sidebars is True:
-		  <% docwrapper_classes = ['document col-sm-9'] %>
-		% else:
-		  <% docwrapper_classes = ['document col-sm-12'] %>
-		% endif
-		  <div class="${' '.join(docwrapper_classes)}">
-		    <div>
-		      ${next.body()}
+		    <div id="sidebar-toggle">
+		      X
+		    </div>
+		  % endif
 
-			  % if context.get("theme_include_debug") is not UNDEFINED:
-		        ${debug()}
-			  % endif
-			</div>
+		  
+		  <div id="page-content-wrapper" class="col-sm-9">
+		    <div class="container-fluid">
+		      <div class="row">
+		  	    <div id="content-container">
+
+                  ${next.body()}
+
+		  	      % if context.get("theme_include_debug") is not UNDEFINED:
+		              ${debug()}
+		  	      % endif
+		  	    </div>
+		  	  </div>
+		    </div>
 		  </div>
-		</div>
+
+		</div> <!-- main-wrapper -->
 		
 	    ## relbar2
 		${self.relbar("fixed-bottom")}
 
 		${self.footer()}
+
+		<script>
+		  $("#sidebar-toggle").click(function(e) {
+		 	e.preventDefault(); 
+			$("#sidebar-wrapper").toggleClass("toggled");
+			$("#sidebar-wrapper").toggleClass("col-sm-3");
+
+			$("#page-content-wrapper").toggleClass("col-sm-9");
+			$("#page-content-wrapper").toggleClass("col-sm-12");
+		  });
+		</script>
 
 	</body>
 </html>
@@ -163,7 +181,7 @@
 </%def>
 
 <%def name="render_sidebar()">
-  <div class="sidebar col-sm-3">
+  <div id="sidebar">
     ## <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
       ## <div class="sphinxsidebarwrapper">
         % if logo is not UNDEFINED and logo:

@@ -22,7 +22,7 @@ div.code-block-caption:hover > a.headerlink {
 	    visibility: visible;
     }
 
-.doc-container {
+#main-wrapper {
     display: flex;
 }
 
@@ -34,11 +34,11 @@ footer {
     background-color: green;
 }
 
-.sidebar {
+#sidebar-wrapper {
     background-color: blue;
 }
 
-.document {
+#page-content-wrapper {
     background-color: orange;
 }
 
@@ -46,3 +46,15 @@ footer {
     background-color: yellow;
 }
 
+#sidebar-toggle {
+    background-color: grey
+}
+
+#sidebar-wrapper {
+    z-index: 1000;
+
+}
+
+.toggled {
+    display: none;
+}
