@@ -56,7 +56,6 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
 
         # this "hack" works to FINALLY get the theme's options
         self.theme_options = self.builder.theme.get_options({})
-        print(self.theme_options)
 
     def visit_literal(self, node):
         # docutils uses <code></code> instead of a bunch of junk like sphinx
