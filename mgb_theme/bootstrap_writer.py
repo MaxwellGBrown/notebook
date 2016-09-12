@@ -40,6 +40,10 @@ admonition_card_cls = {
         "todo": "warning",
         }
 
+# Comment from sphinx/writers/html.py
+# A good overview of the purpose behind these classes can be found here:
+# http://www.arnebrodowski.de/blog/write-your-own-restructuredtext-writer.html
+
 
 class BootstrapTranslator(sphinx_HTMLTranslator):
     """
