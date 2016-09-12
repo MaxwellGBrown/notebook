@@ -59,6 +59,7 @@ class MakoTemplateBridge(TemplateBridge):
         for mako_keyword in ["body", "next", "self", "parent"]:
             if mako_keyword in context:
                 context['sphinx_' + mako_keyword] = context.pop(mako_keyword)
+
         tmpl = self.template_lookup.get_template(template)
         return tmpl.render(**context)
 

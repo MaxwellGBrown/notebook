@@ -25,17 +25,28 @@
 	    ## relbar1
 	    ${self.relbar("fixed-top")}
 
+		<div class="document container-fluid">
 		## render available sidebars?
-		% if not embedded and not theme_nosidebar and sidebars != []:
-		  ${self.render_sidebar()}
+		<% include_sidebars = not embedded and not theme_nosidebar and sidebars != [] %>
+		% if include_sidebars is True:
+		  <div class="sidebar-wrapper col-sm-3">
+		    ${self.render_sidebar()}
+		  </div>
 		% endif
 
 		
-		<div class="document container">
-		  <div class="documentwrapper">
+		% if include_sidebars is True:
+		  <% docwrapper_classes = ['documentwrapper', 'col-sm-9'] %>
+		% else:
+		  <% docwrapper_classes = ['documentwrapper', 'col-sm-12'] %>
+		% endif
+		  <div class="${' '.join(docwrapper_classes)}">
 		    <div class="body" role="main">
-		      ${debug()}
 		      ${next.body()}
+
+			  % if context.get("theme_include_debug") is not UNDEFINED:
+		        ${debug()}
+			  % endif
 			</div>
 		  </div>
 		</div>
@@ -129,6 +140,13 @@
 	    <div class="navbar-header">
 	      <a class="navbar-brand" href="${pathto(master_doc)}">${shorttitle}</a>
 	      <ul class="nav navbar-nav pull-xs-right">
+
+			% if context.get("theme_include_debug") is not UNDEFINED:
+			  <li class="nav-item">
+                <a href="#" class="nav-link" data-toggle="modal" data-target="#debug_modal">debug</a>
+			  </li>
+			% endif
+
 	        % for rellink in rellinks:
 	          <li class="nav-item">
 	            <a class="nav-link" href="${pathto(rellink[0])}" title="${rellink[1]}">${rellink[3]}</a>
@@ -148,7 +166,6 @@
 
 <%def name="render_sidebar()">
   <div class="sidebar">
-    <ul class="nav nav-sidebar">
     ## <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
       ## <div class="sphinxsidebarwrapper">
         % if logo is not UNDEFINED and logo:
@@ -190,7 +207,6 @@
 
       ## </div>
     ## </div>
-	</ul> <!-- class="nav" -->
   </div> <!-- class="sidebar" -->
 </%def>
 
@@ -211,8 +227,6 @@
 </%def>
 
 <%def name="debug()">
-  <a href="#" data-toggle="modal" data-target="#debug_modal">debug</a>
-
   <div id="debug_modal" class="modal fade" tabindex="-1">
     <div class="modal-dialog">
 	  <div class="modal-content">
