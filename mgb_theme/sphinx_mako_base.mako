@@ -23,7 +23,7 @@
         ${self.header()}
 
 	    ## relbar1
-	    ${self.relbar("fixed-top")}
+	    ${self.relbar("fixed-top", id="relbar-top")}
 
 		## Page structure based off of 
 		## https://github.com/BlackrockDigital/startbootstrap-simple-sidebar
@@ -53,10 +53,9 @@
 		</div> <!-- main-wrapper -->
 		
 	    ## relbar2
-		${self.relbar("fixed-bottom")}
+		${self.relbar("fixed-bottom", id="relbar-bottom")}
 
 		${self.footer()}
-
 	</body>
 </html>
 
@@ -129,14 +128,14 @@
 </%def>
 
 <%def name="header()">
-  <header>
+  <header id="header">
     Header
   </header>
 </%def>
 
-<%def name="relbar(*nav_classes)">
+<%def name="relbar(*nav_classes, id='')">
     <% nav_class = " ".join(["navbar"] + list(nav_classes)) %>
-    <nav class="related ${nav_class}" role="navigation">
+    <nav id="${id}" class="related ${nav_class}" role="navigation">
 	  <div class="container">
 	    <div class="navbar-header">
 	      <a class="navbar-brand" href="${pathto(master_doc)}">${shorttitle}</a>
@@ -167,7 +166,7 @@
 
 <%def name="render_sidebar()">
 <div id="sidebar-wrapper" class="col-sm-3">
-  <div id="sidebar">
+  <div id="sidebar" class="sps">
     ## <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
       ## <div class="sphinxsidebarwrapper">
         % if logo is not UNDEFINED and logo:
@@ -218,9 +217,6 @@
 </div>
 
 <script>
-  console.log($("#sidebar").offset().top);
-  $("#sidebar").sticky({topSpacing: $("#sidebar").position().top});
-
   $("#sidebar-toggle").click(function(e) {
  	e.preventDefault(); 
 	$("#sidebar-wrapper").toggleClass("toggled");

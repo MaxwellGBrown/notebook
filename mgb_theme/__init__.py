@@ -31,6 +31,4 @@ def setup(app):
     app.add_javascript("tether/js/tether.js")
     app.add_javascript("bootstrap/js/bootstrap.js")
 
-    app.add_javascript("jquery.sticky.js")
-
     return {'version': "0.0.0"}
