@@ -12,7 +12,9 @@ sqlalchemy comes packaged w/ an *ORM* (Object Relational Model) which allows one
    :maxdepth: 1
 
    Engine Level Transactions & Rollback w/ pytest <../pytest/pytest_database_transaction/pytest_rollback_after_test>
+   Transient/Detatched ORM Objects in pytest Fixtures <../pytest/pytest_transient_sqlalchemy_fixtures/pytest_transient_sqlalchemy_fixtures>
    Moving Objects Between Sessions <moving_objects_between_sessions>
+   
 
 The Basics of the ORM
 ---------------------

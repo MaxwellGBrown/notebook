@@ -116,32 +116,85 @@ Authentication in Pyramids Functional Tests
 
 Since functional tests are operating on the whole application, authentication needs to be sincere. 
 
-What this means is that either:
+To successfully spoof the cookies provided by the application's authentication
+policy, it needs to be separated from the Configurator's initiation.
 
-* A fixture using the ``/login`` feature of the application is set up
-* Plant a session cookie in the application using the secret supplied to it in the testing initialization.
+.. code-block:: python
 
-The former is easier while the latter is more pure.
+    # app_config.py 
 
-Either way the cookies need to be cleared between tests so that the user permissions don't corrupt the next test.
+    import .auth as app_auth
+
+    def main(global_config, **settings):
+        config = Configurator(...)
+
+        ...
+
+        # read auth. from configuration
+        auth_cfg = {k[5:]: v for k, v in settings.items() if k.startswith('auth.')}
+        # initiate authentication policy
+        authn_policy = app_auth.authn_policy(callback=..., **auth_cfg)
+        config.set_authentication_policy(authn_policy)
+
+        # initiate authorization policy
+        authz_policy = app_auth.authz_policy(**auth_cfg)
+        config.set_authorization_policy(authz_policy)
+
+        ...
+
+        return config.make_wsgi_app()
+
+
+Moving both auth policies to **auth.py** is straightforward: they're just
+wrapped in their basic functions.
+
+.. code-block:: python
+
+    from pyramid.authentication import AuthTktAuthenticationPolicy
+    from pyramid.authorization import ACLAuthorizationPolicy
+
+
+    def authn_policy(*args, **kwargs):
+        return AuthTktAuthenticationPolicy(*args, **kwargs)
+
+
+    def authz_policy(*args, **kwargs):
+        return ACLAuthorizationPolicy()
+
+
+After splitting out the auth policies, a fixture can use them to create
+authentication headers/cookies using the same configuration values the
+application is using to create them.
 
 .. code-block:: python
 
     @pytest.fixture(scope="function")
-    def as_user(request, test_app):
-        params = {"login": "test_user", password: "password1"}
-        response = test_app.post("/login", params=params)
-        if "Login Failed" in response.text:
-            raise Exception("Login failed. Fixture compromised.")
+    def as_user(request, settings, test_app, test_user):
+        auth_cfg = {k[5:]: v for k, v in settings.items() if k.startswith('auth.')}
+        authn_policy = app_auth.authn_policy(callback=..., **auth_cfg)
 
-        def clear_cookies():
-            test_app.reset()
-        request.addfinalizer(clear_cookies)
+        # use the app's auth policy to create the cookie
+        environ = {  # required by auth policy's "CookieHelper"
+                "REMOTE_ADDR": "0.0.0.0",
+                "SERVER_NAME": "localhost",
+                "SERVER_PORT": "9999",
+                }
+        auth_request = test_app.app.request_factory(environ)
+        headers = authn_policy.remember(auth_request)
 
-        return "test_user"
+        # strip "cookie_name=" from Set-Cookie header value
+        cookie_name = auth_cfg.get("cookie_name", "auth_tkt")
+        set_cookie = headers[0][1]
+        cookie = set_cookie[len(cookie_name + "="):]
+
+        # save the cookie in the app
+        test_app.set_cookie(cookie_name, cookie)
+
+        request.finalizer(test_app.app.reset)  # clear cookies on teardown
+        return test_user
 
 
     def test_hello_world(test_app, as_user)
         response = test_app.get("/")
-        expected_greeting = "Hello " + as_user
+        expected_greeting = "Hello " + as_user.username
         assert expected_greeting in response.text
