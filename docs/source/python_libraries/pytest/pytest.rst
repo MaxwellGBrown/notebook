@@ -13,6 +13,7 @@ pytest is a unit-testing framework. Use it to write & run unit tests.
 
   Fixtures <pytest_fixtures/fixtures>
   Sharing Session Scoped Fixtures Between Modules <pytest_share_fixtures_in_directory/pytest_share_fixtures_in_dir>
+  pytest_transient_sqlalchemy_fixtures/pytest_transient_sqlalchemy_fixtures
   Rollback sqlalchemy Tranactions per Test Case <pytest_database_transaction/pytest_rollback_after_test>
 
 
