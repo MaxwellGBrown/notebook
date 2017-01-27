@@ -18,9 +18,16 @@ Maxwell G. Brown's Notebook
 This is a notebook kept by Maxwell G Brown to keep track of any neat tricks or abbreviated notes on programming.
 
 
-----------------
+------
+Python
+------
+
+Python was the first language I learned and my first true love.
+
+This section is devoted to any code that is targeted towards python development.
+
 Python Libraries
-----------------
+~~~~~~~~~~~~~~~~
 
 These are examples of how to work with these specific python libraries, whether they be system packages or 3rd party.
 
@@ -49,9 +56,8 @@ Many examples will have functional code examples in ``docs/source/python_librari
    wtforms <python_libraries/wtforms/wtforms>
 
 
---------------------
 Python Code Snippets
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 These are code snippets (usually a function or class) that are small in scope used to solve a certain problem.
 
@@ -68,11 +74,10 @@ Most/all solutions here are cut & paste solutions.
    python_snippets/ini_to_dict
 
 
---------------------
-Programming Patterns
---------------------
+Python Recipes
+~~~~~~~~~~~~~~
 
-These are programming patterns that can be applied to future development.
+These are programming patterns and examples tailored specifically for python development.
 
 Examples aren't necessarily functional examples, but more of a demonstration of how they're used.
 
@@ -83,6 +88,22 @@ Examples aren't necessarily functional examples, but more of a demonstration of 
 
    programming_patterns/dependancy_injection/dependancy_injection
    programming_patterns/metaclasses/metaclasses
+
+
+
+----------
+JavaScript
+----------
+
+This section is dedicated to JavaScript frameworks and examples.
+
+As I've done more web development I've needed to work with more and more JavaScript. It isn't as natural to me as python but doesn't feel nearly as foreign as other languages.
+
+.. toctree:: 
+   :name: javascript
+   :maxdepth: 2
+
+   React <javascript/react/react>
 
 
 --------------
