@@ -8,7 +8,7 @@ from mako.lookup import TemplateLookup
 
 
 class MakoTemplateBridge(TemplateBridge):
-# class MakoTemplateBridge(object):
+    # class MakoTemplateBridge(object):
 
     def init(self, builder, theme=None, dirs=None):
         """
