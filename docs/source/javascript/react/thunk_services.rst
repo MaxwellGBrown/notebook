@@ -2,6 +2,20 @@
 Using Services In Components
 ============================
 
+Suggested Reading:
+
+* `JavaScript Promises: an Introduction <https://developers.google.com/web/fundamentals/getting-started/primers/promises>`__
+* `Redux Async Actions <http://redux.js.org/docs/advanced/AsyncActions.html>`__
+* `Redux Thunk README <https://github.com/gaearon/redux-thunk/blob/master/README.md>`__
+
+This example is operating on the assumption that you're using:
+
+* **React** to compose the DOM
+* **Redux** to handle the global application state
+* **Thunk** to create "thunk" services to dispatch redux actions
+
+This example isn't a code-complet example; the structure and composition of this code is assumed to be done using the above frameworks and packages.
+
 
 This is The Correct Way
 -----------------------
