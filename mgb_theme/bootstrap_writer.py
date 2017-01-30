@@ -21,7 +21,10 @@ https://github.com/tell-k/sphinxjp.themes.basicstrap/tree/master/src
 # To use a custom writer, you'll also probably have to define a special builder
 # class that specifically uses that builder.
 
-from docutils.writers.html4css1 import HTMLTranslator as docutils_HTMLTranslator
+from docutils.writers.html4css1 \
+        import HTMLTranslator \
+        as docutils_HTMLTranslator
+
 from docutils import nodes
 
 from sphinx.writers.html import HTMLTranslator as sphinx_HTMLTranslator
@@ -69,7 +72,6 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
                 return raw_value
         else:
             return raw_value
-
 
     def visit_literal(self, node):
         # docutils uses <code></code> instead of a bunch of junk like sphinx
@@ -127,14 +129,18 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
             target_node = image_nodes and image_nodes[0] or node.parent
             self.add_permalink_ref(target_node, _('Permalink to this image'))
         elif node.parent.get('toctree'):
-            self.add_permalink_ref(node.parent.parent,
-                    _('Permalink to this toctree'))
+            self.add_permalink_ref(
+                    node.parent.parent,
+                    _('Permalink to this toctree')
+            )
 
         if isinstance(node.parent, nodes.container) and \
                 node.parent.get('literal_block'):
             self.body.append('</div>\n')
         else:
-            BaseTranslator.depart_caption(self, node)
+            # BaseTranslator isn't defined... idk where I got this from
+            # BaseTranslator.depart_caption(self, node)
+            pass
 
         self.body.append('</div>\n')
 
@@ -206,5 +212,3 @@ class BootstrapTranslator(sphinx_HTMLTranslator):
             self.context.append("</p>\n</div>\n")
         else:
             super().visit_paragraph(node)
-
-
