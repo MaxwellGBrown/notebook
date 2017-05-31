@@ -11,7 +11,7 @@
 URL Dispatch
 ------------
 
-`URL Dispatch <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/urldispatch.html#urldispatch-chapter>`__ relies on defining more static `routes`_ which have it's values
+`URL Dispatch <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/urldispatch.html#urldispatch-chapter>`__ relies on defining more static `routes`_ which have its values
 decoded in a URL as ``request.matchdict``, a key-value of the routes to their
 URL pattern.
 
