@@ -4,7 +4,7 @@
 argparse
 ========
 
-`argparse <https://docs.python.org/3/library/argparse.html>`__ is a package used to parse command-line arguments. Use it to spice-up your scripts!
+`argparse <https://docs.python.org/3/library/argparse.html>`__ is a package used to parse command-line arguments. Use it to make command-line 
 
 ----------
 Quickstart
@@ -14,33 +14,43 @@ argparse at the highest level is a pretty straight-forward package.
 
 All you have to do is define an ``ArgumentParser``, add some arguments using ``ArgumentParser.add_argument()``, and then call ``ArgumentParser.parse_args()``. 
 
-``ArgumentParser``'s initialization/customization arguments `can be found here <https://docs.python.org/3/library/argparse.html#argumentparser-objects>`__
-``ArgumentParser.add_argument()``'s args & kwargs `can be found here <https://docs.python.org/3/library/argparse.html#the-add-argument-method>`__
-
 .. code-block:: python
 
   import argparse
 
+  # A "script" should just be a way to call business logic modules!
+  # Make them separate!
+  import business_logic
+
+
   def main(**kwargs):
-      print("argument1: ", args.argument1)
-      print("--flag1/-f was used: ", args.first_flag)
+      business_logic.do_the_thing(**kwargs) 
 
-  def parse_args():
-      parser = argparse.ArgumentParser(description="An example script!")
 
-      parser.add_argument("argument1", type=int, help="the first arg!")
-      parser.add_argument("--flag1", "-f1", dest="first_flag", action="store_true",
-              default=False)
+  # Define the Parser at the module level for your script.
+  parser = argparse.ArgumentParser(description="An example script!")
+  parser.add_argument("argument1", type=int, help="the first arg!")
+  parser.add_argument("--flag1", "-f1",
+      dest="first_flag",
+      action="store_true",
+      default=False
+  )
 
-      args = parser.parse_args()  # auto-magically gathers command-line args
-      args_dict = vars(args)  # parser.parse_args returns a Namespace. This is a dict
-      return dict(args_dict)
 
   if __name__ == "__main__":
-      args_dict = parse_args()
+      args = parser.parse_args()
+      args_dict = vars(args)  # Namespace => dict conversion
       main(**args_dict)
 
 
+---------
+Resources
+---------
 
-It's supposedly "best bractice" to have a ``parse_args`` function to handle command line arguments. It certainly does clean up the ``if __name__ == "__main__":`` section.
-
+* `ArgumentParser <https://docs.python.org/3/library/argparse.html#argumentparser-objects>`__
+* `add_argument() <https://docs.python.org/3/library/argparse.html#the-add-argument-method>`__
+* `add_argument's 'type' keyword <https://docs.python.org/3/library/argparse.html#type>`__
+* `argparse.FileType <https://docs.python.org/3/library/argparse.html#filetype-objects>`__
+* `Argument Groups <https://docs.python.org/3/library/argparse.html#argument-groups>`__
+* `Sub-commands & Sub-parsers <https://docs.python.org/3/library/argparse.html#sub-commands>`__
+* `setup.py entry_points for console scripts <http://python-packaging.readthedocs.io/en/latest/command-line-scripts.html#the-console-scripts-entry-point>`__
